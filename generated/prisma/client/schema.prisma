@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum VendorStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  REJECTED
+}
+
+enum RiderStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  PREPARING
+  READY_FOR_PICKUP
+  PICKED_UP
+  DELIVERED
+  CANCELLED
+}
+
+enum VehicleType {
+  BICYCLE
+  MOTORCYCLE
+  CAR
+}
+
+model Vendor {
+  id                  String       @id @default(cuid())
+  clerkUserId         String       @unique
+  name                String
+  description         String
+  logo                String
+  address             String
+  state               String
+  localGovernmentArea String
+  phoneNumber         String
+  cuisineType         String[]
+  status              VendorStatus @default(PENDING)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  images              String[]
+  backUpPhoneNumber   String?
+  menuItems           MenuItem[]
+  orders              Order[]
+  email               String
+  adminNote           String?
+}
+
+model MenuItem {
+  id          String   @id @default(cuid())
+  vendorId    String
+  vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  price       Decimal
+  image       String?
+  category    String
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems OrderItem[]
+}
+
+model Rider {
+  id          String      @id @default(cuid())
+  clerkUserId String      @unique
+  phone       String
+  vehicleType VehicleType
+  isAvailable Boolean     @default(false)
+  latitude    Float?
+  longitude   Float?
+  status      RiderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  orders Order[]
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  clerkUserId     String
+  vendorId        String
+  vendor          Vendor      @relation(fields: [vendorId], references: [id])
+  riderId         String?
+  rider           Rider?      @relation(fields: [riderId], references: [id])
+  status          OrderStatus @default(PENDING_PAYMENT)
+  totalAmount     Decimal
+  deliveryAddress String
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  orderItems OrderItem[]
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  quantity   Int
+  unitPrice  Decimal
+  createdAt  DateTime @default(now())
+}
