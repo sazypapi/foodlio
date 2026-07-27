@@ -68,6 +68,7 @@ export const OrderStatus: {
   PREPARING: 'PREPARING',
   READY_FOR_PICKUP: 'READY_FOR_PICKUP',
   PICKED_UP: 'PICKED_UP',
+  OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
   DELIVERED: 'DELIVERED',
   CANCELLED: 'CANCELLED'
 };
@@ -1450,6 +1451,7 @@ export namespace Prisma {
     backUpPhoneNumber: string | null
     email: string | null
     adminNote: string | null
+    closeOpenStatus: boolean | null
   }
 
   export type VendorMaxAggregateOutputType = {
@@ -1468,6 +1470,7 @@ export namespace Prisma {
     backUpPhoneNumber: string | null
     email: string | null
     adminNote: string | null
+    closeOpenStatus: boolean | null
   }
 
   export type VendorCountAggregateOutputType = {
@@ -1488,6 +1491,7 @@ export namespace Prisma {
     backUpPhoneNumber: number
     email: number
     adminNote: number
+    closeOpenStatus: number
     _all: number
   }
 
@@ -1508,6 +1512,7 @@ export namespace Prisma {
     backUpPhoneNumber?: true
     email?: true
     adminNote?: true
+    closeOpenStatus?: true
   }
 
   export type VendorMaxAggregateInputType = {
@@ -1526,6 +1531,7 @@ export namespace Prisma {
     backUpPhoneNumber?: true
     email?: true
     adminNote?: true
+    closeOpenStatus?: true
   }
 
   export type VendorCountAggregateInputType = {
@@ -1546,6 +1552,7 @@ export namespace Prisma {
     backUpPhoneNumber?: true
     email?: true
     adminNote?: true
+    closeOpenStatus?: true
     _all?: true
   }
 
@@ -1639,6 +1646,7 @@ export namespace Prisma {
     backUpPhoneNumber: string | null
     email: string
     adminNote: string | null
+    closeOpenStatus: boolean
     _count: VendorCountAggregateOutputType | null
     _min: VendorMinAggregateOutputType | null
     _max: VendorMaxAggregateOutputType | null
@@ -1676,6 +1684,7 @@ export namespace Prisma {
     backUpPhoneNumber?: boolean
     email?: boolean
     adminNote?: boolean
+    closeOpenStatus?: boolean
     menuItems?: boolean | Vendor$menuItemsArgs<ExtArgs>
     orders?: boolean | Vendor$ordersArgs<ExtArgs>
     _count?: boolean | VendorCountOutputTypeDefaultArgs<ExtArgs>
@@ -1699,6 +1708,7 @@ export namespace Prisma {
     backUpPhoneNumber?: boolean
     email?: boolean
     adminNote?: boolean
+    closeOpenStatus?: boolean
   }, ExtArgs["result"]["vendor"]>
 
   export type VendorSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1719,6 +1729,7 @@ export namespace Prisma {
     backUpPhoneNumber?: boolean
     email?: boolean
     adminNote?: boolean
+    closeOpenStatus?: boolean
   }, ExtArgs["result"]["vendor"]>
 
   export type VendorSelectScalar = {
@@ -1739,9 +1750,10 @@ export namespace Prisma {
     backUpPhoneNumber?: boolean
     email?: boolean
     adminNote?: boolean
+    closeOpenStatus?: boolean
   }
 
-  export type VendorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clerkUserId" | "name" | "description" | "logo" | "address" | "state" | "localGovernmentArea" | "phoneNumber" | "cuisineType" | "status" | "createdAt" | "updatedAt" | "images" | "backUpPhoneNumber" | "email" | "adminNote", ExtArgs["result"]["vendor"]>
+  export type VendorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clerkUserId" | "name" | "description" | "logo" | "address" | "state" | "localGovernmentArea" | "phoneNumber" | "cuisineType" | "status" | "createdAt" | "updatedAt" | "images" | "backUpPhoneNumber" | "email" | "adminNote" | "closeOpenStatus", ExtArgs["result"]["vendor"]>
   export type VendorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     menuItems?: boolean | Vendor$menuItemsArgs<ExtArgs>
     orders?: boolean | Vendor$ordersArgs<ExtArgs>
@@ -1774,6 +1786,7 @@ export namespace Prisma {
       backUpPhoneNumber: string | null
       email: string
       adminNote: string | null
+      closeOpenStatus: boolean
     }, ExtArgs["result"]["vendor"]>
     composites: {}
   }
@@ -2216,6 +2229,7 @@ export namespace Prisma {
     readonly backUpPhoneNumber: FieldRef<"Vendor", 'String'>
     readonly email: FieldRef<"Vendor", 'String'>
     readonly adminNote: FieldRef<"Vendor", 'String'>
+    readonly closeOpenStatus: FieldRef<"Vendor", 'Boolean'>
   }
     
 
@@ -7404,7 +7418,8 @@ export namespace Prisma {
     images: 'images',
     backUpPhoneNumber: 'backUpPhoneNumber',
     email: 'email',
-    adminNote: 'adminNote'
+    adminNote: 'adminNote',
+    closeOpenStatus: 'closeOpenStatus'
   };
 
   export type VendorScalarFieldEnum = (typeof VendorScalarFieldEnum)[keyof typeof VendorScalarFieldEnum]
@@ -7541,6 +7556,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'Decimal'
    */
   export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -7551,13 +7573,6 @@ export namespace Prisma {
    * Reference to a field of type 'Decimal[]'
    */
   export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -7655,6 +7670,7 @@ export namespace Prisma {
     backUpPhoneNumber?: StringNullableFilter<"Vendor"> | string | null
     email?: StringFilter<"Vendor"> | string
     adminNote?: StringNullableFilter<"Vendor"> | string | null
+    closeOpenStatus?: BoolFilter<"Vendor"> | boolean
     menuItems?: MenuItemListRelationFilter
     orders?: OrderListRelationFilter
   }
@@ -7677,6 +7693,7 @@ export namespace Prisma {
     backUpPhoneNumber?: SortOrderInput | SortOrder
     email?: SortOrder
     adminNote?: SortOrderInput | SortOrder
+    closeOpenStatus?: SortOrder
     menuItems?: MenuItemOrderByRelationAggregateInput
     orders?: OrderOrderByRelationAggregateInput
   }
@@ -7702,6 +7719,7 @@ export namespace Prisma {
     backUpPhoneNumber?: StringNullableFilter<"Vendor"> | string | null
     email?: StringFilter<"Vendor"> | string
     adminNote?: StringNullableFilter<"Vendor"> | string | null
+    closeOpenStatus?: BoolFilter<"Vendor"> | boolean
     menuItems?: MenuItemListRelationFilter
     orders?: OrderListRelationFilter
   }, "id" | "clerkUserId">
@@ -7724,6 +7742,7 @@ export namespace Prisma {
     backUpPhoneNumber?: SortOrderInput | SortOrder
     email?: SortOrder
     adminNote?: SortOrderInput | SortOrder
+    closeOpenStatus?: SortOrder
     _count?: VendorCountOrderByAggregateInput
     _max?: VendorMaxOrderByAggregateInput
     _min?: VendorMinOrderByAggregateInput
@@ -7750,6 +7769,7 @@ export namespace Prisma {
     backUpPhoneNumber?: StringNullableWithAggregatesFilter<"Vendor"> | string | null
     email?: StringWithAggregatesFilter<"Vendor"> | string
     adminNote?: StringNullableWithAggregatesFilter<"Vendor"> | string | null
+    closeOpenStatus?: BoolWithAggregatesFilter<"Vendor"> | boolean
   }
 
   export type MenuItemWhereInput = {
@@ -8085,6 +8105,7 @@ export namespace Prisma {
     backUpPhoneNumber?: string | null
     email: string
     adminNote?: string | null
+    closeOpenStatus?: boolean
     menuItems?: MenuItemCreateNestedManyWithoutVendorInput
     orders?: OrderCreateNestedManyWithoutVendorInput
   }
@@ -8107,6 +8128,7 @@ export namespace Prisma {
     backUpPhoneNumber?: string | null
     email: string
     adminNote?: string | null
+    closeOpenStatus?: boolean
     menuItems?: MenuItemUncheckedCreateNestedManyWithoutVendorInput
     orders?: OrderUncheckedCreateNestedManyWithoutVendorInput
   }
@@ -8129,6 +8151,7 @@ export namespace Prisma {
     backUpPhoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    closeOpenStatus?: BoolFieldUpdateOperationsInput | boolean
     menuItems?: MenuItemUpdateManyWithoutVendorNestedInput
     orders?: OrderUpdateManyWithoutVendorNestedInput
   }
@@ -8151,6 +8174,7 @@ export namespace Prisma {
     backUpPhoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    closeOpenStatus?: BoolFieldUpdateOperationsInput | boolean
     menuItems?: MenuItemUncheckedUpdateManyWithoutVendorNestedInput
     orders?: OrderUncheckedUpdateManyWithoutVendorNestedInput
   }
@@ -8173,6 +8197,7 @@ export namespace Prisma {
     backUpPhoneNumber?: string | null
     email: string
     adminNote?: string | null
+    closeOpenStatus?: boolean
   }
 
   export type VendorUpdateManyMutationInput = {
@@ -8193,6 +8218,7 @@ export namespace Prisma {
     backUpPhoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    closeOpenStatus?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type VendorUncheckedUpdateManyInput = {
@@ -8213,6 +8239,7 @@ export namespace Prisma {
     backUpPhoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    closeOpenStatus?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type MenuItemCreateInput = {
@@ -8607,6 +8634,11 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type MenuItemListRelationFilter = {
     every?: MenuItemWhereInput
     some?: MenuItemWhereInput
@@ -8650,6 +8682,7 @@ export namespace Prisma {
     backUpPhoneNumber?: SortOrder
     email?: SortOrder
     adminNote?: SortOrder
+    closeOpenStatus?: SortOrder
   }
 
   export type VendorMaxOrderByAggregateInput = {
@@ -8668,6 +8701,7 @@ export namespace Prisma {
     backUpPhoneNumber?: SortOrder
     email?: SortOrder
     adminNote?: SortOrder
+    closeOpenStatus?: SortOrder
   }
 
   export type VendorMinOrderByAggregateInput = {
@@ -8686,6 +8720,7 @@ export namespace Prisma {
     backUpPhoneNumber?: SortOrder
     email?: SortOrder
     adminNote?: SortOrder
+    closeOpenStatus?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -8748,6 +8783,14 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type DecimalFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
@@ -8757,11 +8800,6 @@ export namespace Prisma {
     gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-  }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type VendorScalarRelationFilter = {
@@ -8840,14 +8878,6 @@ export namespace Prisma {
     _sum?: NestedDecimalFilter<$PrismaModel>
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type EnumVehicleTypeFilter<$PrismaModel = never> = {
@@ -9162,6 +9192,10 @@ export namespace Prisma {
     set?: string | null
   }
 
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
   export type MenuItemUpdateManyWithoutVendorNestedInput = {
     create?: XOR<MenuItemCreateWithoutVendorInput, MenuItemUncheckedCreateWithoutVendorInput> | MenuItemCreateWithoutVendorInput[] | MenuItemUncheckedCreateWithoutVendorInput[]
     connectOrCreate?: MenuItemCreateOrConnectWithoutVendorInput | MenuItemCreateOrConnectWithoutVendorInput[]
@@ -9244,10 +9278,6 @@ export namespace Prisma {
     decrement?: Decimal | DecimalJsLike | number | string
     multiply?: Decimal | DecimalJsLike | number | string
     divide?: Decimal | DecimalJsLike | number | string
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type VendorUpdateOneRequiredWithoutMenuItemsNestedInput = {
@@ -9502,6 +9532,11 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -9582,6 +9617,14 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type NestedDecimalFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
@@ -9591,11 +9634,6 @@ export namespace Prisma {
     gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
@@ -9612,14 +9650,6 @@ export namespace Prisma {
     _sum?: NestedDecimalFilter<$PrismaModel>
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedEnumVehicleTypeFilter<$PrismaModel = never> = {
@@ -9878,6 +9908,7 @@ export namespace Prisma {
     backUpPhoneNumber?: string | null
     email: string
     adminNote?: string | null
+    closeOpenStatus?: boolean
     orders?: OrderCreateNestedManyWithoutVendorInput
   }
 
@@ -9899,6 +9930,7 @@ export namespace Prisma {
     backUpPhoneNumber?: string | null
     email: string
     adminNote?: string | null
+    closeOpenStatus?: boolean
     orders?: OrderUncheckedCreateNestedManyWithoutVendorInput
   }
 
@@ -9962,6 +9994,7 @@ export namespace Prisma {
     backUpPhoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    closeOpenStatus?: BoolFieldUpdateOperationsInput | boolean
     orders?: OrderUpdateManyWithoutVendorNestedInput
   }
 
@@ -9983,6 +10016,7 @@ export namespace Prisma {
     backUpPhoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    closeOpenStatus?: BoolFieldUpdateOperationsInput | boolean
     orders?: OrderUncheckedUpdateManyWithoutVendorNestedInput
   }
 
@@ -10082,6 +10116,7 @@ export namespace Prisma {
     backUpPhoneNumber?: string | null
     email: string
     adminNote?: string | null
+    closeOpenStatus?: boolean
     menuItems?: MenuItemCreateNestedManyWithoutVendorInput
   }
 
@@ -10103,6 +10138,7 @@ export namespace Prisma {
     backUpPhoneNumber?: string | null
     email: string
     adminNote?: string | null
+    closeOpenStatus?: boolean
     menuItems?: MenuItemUncheckedCreateNestedManyWithoutVendorInput
   }
 
@@ -10197,6 +10233,7 @@ export namespace Prisma {
     backUpPhoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    closeOpenStatus?: BoolFieldUpdateOperationsInput | boolean
     menuItems?: MenuItemUpdateManyWithoutVendorNestedInput
   }
 
@@ -10218,6 +10255,7 @@ export namespace Prisma {
     backUpPhoneNumber?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    closeOpenStatus?: BoolFieldUpdateOperationsInput | boolean
     menuItems?: MenuItemUncheckedUpdateManyWithoutVendorNestedInput
   }
 

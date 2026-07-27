@@ -137,7 +137,8 @@ exports.Prisma.VendorScalarFieldEnum = {
   images: 'images',
   backUpPhoneNumber: 'backUpPhoneNumber',
   email: 'email',
-  adminNote: 'adminNote'
+  adminNote: 'adminNote',
+  closeOpenStatus: 'closeOpenStatus'
 };
 
 exports.Prisma.MenuItemScalarFieldEnum = {
@@ -226,6 +227,7 @@ exports.OrderStatus = exports.$Enums.OrderStatus = {
   PREPARING: 'PREPARING',
   READY_FOR_PICKUP: 'READY_FOR_PICKUP',
   PICKED_UP: 'PICKED_UP',
+  OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
   DELIVERED: 'DELIVERED',
   CANCELLED: 'CANCELLED'
 };

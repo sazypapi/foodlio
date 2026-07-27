@@ -26,6 +26,7 @@ enum OrderStatus {
   PREPARING
   READY_FOR_PICKUP
   PICKED_UP
+  OUT_FOR_DELIVERY
   DELIVERED
   CANCELLED
 }
@@ -56,6 +57,7 @@ model Vendor {
   orders              Order[]
   email               String
   adminNote           String?
+  closeOpenStatus     Boolean      @default(false)
 }
 
 model MenuItem {

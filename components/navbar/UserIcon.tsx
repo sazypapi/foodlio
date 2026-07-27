@@ -1,10 +1,5 @@
 "use client";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 import { LuUser } from "react-icons/lu";
 import {
   Show,
@@ -21,10 +16,12 @@ import Image from "next/image";
 function UserIcon({ isAdmin }: { isAdmin: boolean }) {
   const { user, isSignedIn, isLoaded } = useUser();
   const { signOut } = useClerk();
+  const [open, setOpen] = useState(false);
 
   const toastLogout = async () => {
     await signOut();
     toast("Successfully Logged Out");
+    setOpen(false);
   };
 
   if (!isLoaded) {
@@ -38,73 +35,99 @@ function UserIcon({ isAdmin }: { isAdmin: boolean }) {
   if (isSignedIn && user) {
     const profileImage = user.imageUrl;
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          {profileImage ? (
-            <Image
-              src={profileImage}
-              width={28}
-              height={28}
-              alt="Profile pic"
-              className=" h-8 w-8 rounded-full object-cover cursor-pointer"
-            />
-          ) : (
-            <div className="flex align-middle items-center cursor-pointer">
-              <LuUser className="h-8 w-8 bg-primary text-gray-300 rounded-full" />
+      <div
+        className="relative"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}>
+        {profileImage ? (
+          <Image
+            src={profileImage}
+            width={28}
+            height={28}
+            alt="Profile pic"
+            className="h-8 w-8 rounded-full object-cover cursor-pointer"
+          />
+        ) : (
+          <div className="flex align-middle items-center cursor-pointer">
+            <LuUser className="h-8 w-8 bg-primary text-gray-300 rounded-full" />
+          </div>
+        )}
+
+        {open && (
+          <>
+            <div className="absolute top-full right-0 w-full h-2" />
+            <div className="absolute top-[calc(100%+4px)] right-0 w-44 bg-white border border-gray-200 rounded-md py-1 z-50 text-black">
+              <Link href="/dashboard/account">
+                <div
+                  className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
+                  onClick={() => setOpen(false)}>
+                  My Account
+                </div>
+              </Link>
+              <Link href="/dashboard/orders">
+                <div
+                  className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
+                  onClick={() => setOpen(false)}>
+                  Orders
+                </div>
+              </Link>
+              <Link href="/dashboard/wishlist">
+                <div
+                  className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
+                  onClick={() => setOpen(false)}>
+                  Wishlist
+                </div>
+              </Link>
+              {isAdmin && (
+                <Link href="/admin/dashboard">
+                  <div
+                    className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
+                    onClick={() => setOpen(false)}>
+                    Admin Dashboard
+                  </div>
+                </Link>
+              )}
+              <div
+                className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
+                onClick={toastLogout}>
+                <SignOutButton>Logout</SignOutButton>
+              </div>
             </div>
-          )}
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" side="top" className="z-[9999] w-fit">
-          <Link href="/dashboard/account">
-            <DropdownMenuItem className="active:bg-neutral-100 transition duration-150">
-              My Account
-            </DropdownMenuItem>
-          </Link>
-          <Link href="/dashboard/orders">
-            <DropdownMenuItem className="active:bg-neutral-100 transition duration-150">
-              Orders
-            </DropdownMenuItem>
-          </Link>
-          <Link href="/dashboard/wishlist">
-            <DropdownMenuItem className="active:bg-neutral-100 transition duration-150">
-              Wishlist
-            </DropdownMenuItem>
-          </Link>
-          {isAdmin && (
-            <Link href="/admin/dashboard">
-              <DropdownMenuItem className="active:bg-neutral-100 transition duration-150">
-                Admin Dashboard
-              </DropdownMenuItem>
-            </Link>
-          )}
-          <DropdownMenuItem
-            className="active:bg-neutral-100 transition duration-150 cursor-pointer"
-            onClick={toastLogout}>
-            <SignOutButton>Logout</SignOutButton>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </>
+        )}
+      </div>
     );
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <div className="flex align-middle items-center cursor-pointer">
-          <LuUser className="h-8 w-8 bg-primary text-gray-300 rounded-full" />
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" side="top" className="z-[9999]">
-        <Show when="signed-out">
-          <DropdownMenuItem className="active:bg-neutral-100 transition duration-150">
-            <SignInButton mode="modal">Login</SignInButton>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="active:bg-neutral-100 transition duration-150">
-            <SignUpButton mode="modal">Register</SignUpButton>
-          </DropdownMenuItem>
-        </Show>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}>
+      <div className="flex align-middle items-center cursor-pointer">
+        <LuUser className="h-8 w-8 bg-primary text-gray-300 rounded-full" />
+      </div>
+
+      {open && (
+        <>
+          <div className="absolute top-full right-0 w-full h-2" />
+          <div className="absolute top-[calc(100%+4px)] right-0 w-40 bg-white border border-gray-200 rounded-md py-1 z-50 text-black">
+            <Show when="signed-out">
+              <div
+                className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
+                onClick={() => setOpen(false)}>
+                <SignInButton mode="modal">Login</SignInButton>
+              </div>
+              <div
+                className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
+                onClick={() => setOpen(false)}>
+                <SignUpButton mode="modal">Register</SignUpButton>
+              </div>
+            </Show>
+          </div>
+        </>
+      )}
+    </div>
   );
 }
 
