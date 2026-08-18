@@ -86,7 +86,8 @@ function ApplicationForm() {
         ) : (
           <Button
             className="capitalize bg-white text-black hover:bg-black hover:text-white transition-all duration-300 border-2 border-black"
-            disabled>
+            disabled
+          >
             Upload your logo to submit
           </Button>
         )}

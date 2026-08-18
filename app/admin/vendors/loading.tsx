@@ -25,7 +25,7 @@ export default function VendorsLoading() {
   return (
     <div>
       {/* Breadcrumb skeleton */}
-      <div className="h-3 w-40 bg-gray-100 rounded animate-pulse mb-6" />
+      <div className="h-3 w-40 bg-gray-100 rounded animate-pulse mb-6 sm:hidden" />
 
       {/* Title skeleton */}
       <div className="h-6 w-48 bg-gray-100 rounded animate-pulse mb-6" />

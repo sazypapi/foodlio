@@ -14,6 +14,7 @@ const isVendorRoute = createRouteMatcher(["/vendor", "/vendor/(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
   // Set pathname header
+  console.log("PROXY HIT:", req.nextUrl.pathname);
   const headers = new Headers(req.headers);
   headers.set("x-pathname", req.nextUrl.pathname);
   const response = NextResponse.next({ request: { headers } });

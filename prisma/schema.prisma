@@ -6,6 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
 enum VendorStatus {
   PENDING
   ACTIVE
@@ -37,41 +38,131 @@ enum VehicleType {
 }
 
 model Vendor {
-  id          String       @id @default(cuid())
-  clerkUserId String       @unique
-  name        String  
-  description String
-  logo        String
-  address     String
-  state       String
+  id                  String          @id @default(cuid())
+  clerkUserId         String          @unique
+  name                String
+  slug String
+  description         String
+  logo                String
+  address             String
+  state               String
   localGovernmentArea String
-  phoneNumber      String
-cuisineType  String[]
-  status      VendorStatus @default(PENDING)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  images      String[]
-backUpPhoneNumber  String?
-  menuItems   MenuItem[]
-  orders      Order[]
-  email String
-  adminNote String?
-  closeOpenStatus Boolean @default(false)
+  phoneNumber         String
+  cuisineType         String[]
+  status              VendorStatus    @default(PENDING)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  images              String[]
+  backUpPhoneNumber   String?
+  menuItems           MenuItem[]
+  categories          Category[]
+  orders              Order[]
+  email               String
+  adminNote           String?
+  closeOpenStatus     Boolean         @default(false)
+  packTypes           PackType[]
+  proteinOptions      ProteinOption[]
+  sideOptions         SideOption[]
+  carbOptions         CarbOption[]
+  minimumPrice        Decimal?
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String
+  slug String
+  vendorId  String
+  vendor    Vendor     @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  menuItems MenuItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  @@unique([vendorId, name])
 }
 
 model MenuItem {
+  id                     String      @id @default(cuid())
+  vendorId               String
+  categoryId             String
+  category               Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name                   String
+  slug String
+  description            String
+  price                  Decimal
+  image                  String
+  isAvailable            Boolean     @default(false)
+  discount               Float?
+  addProteinOptions      Boolean     @default(false)
+  addCarbohydrateOptions Boolean     @default(false)
+  addSides               Boolean     @default(false)
+  vendor                 Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  orderItems             OrderItem[]
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+}
+
+model CarbOption {
+  id             String          @id @default(cuid())
+  name           String 
+  slug String
+
+  extraPrice     Int             @default(0)
+  isAvailable    Boolean         @default(true)
+  vendorId       String
+  vendor         Vendor          @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  orderItemCarbs OrderItemCarb[]
+}
+
+// Pack type is chosen once per order, not per menu item — scoped to the vendor
+model PackType {
   id          String   @id @default(cuid())
+  name        String 
+  slug String
+  extraPrice  Int      @default(0)
+  isAvailable Boolean  @default(true)
   vendorId    String
   vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-  name        String
-  description String?
-  price       Decimal
-  image       String?
-  category    String
-  isAvailable Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  orders      Order[]
+}
 
+model OrderItemCarb {
+  id           String     @id @default(cuid())
+  orderItem    OrderItem  @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  orderItemId  String
+  carbOption   CarbOption @relation(fields: [carbOptionId], references: [id])
+  carbOptionId String
+
+  @@unique([orderItemId, carbOptionId])
+}
+
+model SideOption {
+  id             String          @id @default(cuid())
+  name           String 
+  slug String
+  extraPrice     Int             @default(0)
+  isAvailable    Boolean         @default(true)
+  vendorId       String
+  vendor         Vendor          @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  orderItemSides OrderItemSide[]
+}
+
+model OrderItemSide {
+  id           String     @id @default(cuid())
+  orderItem    OrderItem  @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  orderItemId  String
+  sideOption   SideOption @relation(fields: [sideOptionId], references: [id])
+  sideOptionId String
+
+  @@unique([orderItemId, sideOptionId]) // prevent duplicate selection of same side
+}
+
+model ProteinOption {
+  id          String      @id @default(cuid())
+  name        String
+  slug String
+  extraPrice  Int         @default(0)
+  isAvailable Boolean     @default(true)
+  vendorId    String
+  vendor      Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   orderItems  OrderItem[]
 }
 
@@ -81,12 +172,9 @@ model Rider {
   phone       String
   vehicleType VehicleType
   isAvailable Boolean     @default(false)
-  latitude    Float?
-  longitude   Float?
   status      RiderStatus @default(PENDING)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-
   orders      Order[]
 }
 
@@ -102,17 +190,22 @@ model Order {
   deliveryAddress String
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
-
+  packTypeId      String?
+  packType        PackType?   @relation(fields: [packTypeId], references: [id])
   orderItems      OrderItem[]
 }
 
 model OrderItem {
-  id         String   @id @default(cuid())
-  orderId    String
-  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  menuItemId String
-  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
-  quantity   Int
-  unitPrice  Decimal
-  createdAt  DateTime @default(now())
+  id              String          @id @default(cuid())
+  orderId         String
+  order           Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId      String
+  menuItem        MenuItem        @relation(fields: [menuItemId], references: [id])
+  quantity        Int
+  unitPrice       Decimal
+  proteinOptionId String?
+  proteinOption   ProteinOption?  @relation(fields: [proteinOptionId], references: [id])
+  createdAt       DateTime        @default(now())
+  orderItemSides  OrderItemSide[]
+  orderItemCarbs  OrderItemCarb[]
 }

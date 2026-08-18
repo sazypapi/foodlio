@@ -50,14 +50,15 @@ export default function ApplicationFormLogo({
 
           {/* IMPORTANT: This sends the image URL to your server action */}
           <input type="hidden" name="logo" value={uploadedUrl} />
-
-          <Image
-            src={uploadedUrl}
-            alt="Uploaded"
-            width={128}
-            height={128}
-            className="object-cover rounded-lg"
-          />
+          <div className="relative w-28 h-28 rounded-lg overflow-hidden">
+            <Image
+              src={uploadedUrl}
+              alt="Uploaded"
+              width={128}
+              height={128}
+              className="object-cover rounded-lg mt-2"
+            />
+          </div>
         </>
       ) : (
         <>
@@ -69,26 +70,29 @@ export default function ApplicationFormLogo({
               type="file"
               accept="image/*"
               onChange={(e) => handleFileSelection(e.target.files?.[0] || null)}
-              className="border-2 border-gray-300 w-full p-2 rounded-sm"
+              className="border w-full p-2 rounded-sm"
             />
 
             <Button
               variant="default"
               onClick={handleUpload}
               className="rounded-sm bg-white border-2 border-black hover:bg-black transition duration-500 text-black hover:text-white py-4"
-              disabled={isUploading || !file}>
+              disabled={isUploading || !file}
+            >
               {isUploading ? "Uploading..." : "Upload"}
             </Button>
           </div>
 
           {filePreview && (
-            <Image
-              src={filePreview}
-              alt="Preview"
-              width={128}
-              height={128}
-              className="object-cover rounded-lg mt-2"
-            />
+            <div className="relative w-28 h-28 rounded-lg overflow-hidden">
+              <Image
+                src={filePreview}
+                alt="Preview"
+                width={128}
+                height={128}
+                className="object-cover rounded-lg mt-2"
+              />
+            </div>
           )}
         </>
       )}

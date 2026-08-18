@@ -37,7 +37,7 @@ export default function RootLayout({
         "font-sans",
         inter.variable,
       )}>
-      <body suppressHydrationWarning className="">
+      <body suppressHydrationWarning className="w-[100%]">
         <ClerkProvider>
           <EdgeStoreProvider>
             <Suspense fallback={<NavbarSkeleton />}>

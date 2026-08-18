@@ -1,5 +1,5 @@
-import { OrderStatus } from "@prisma/client";
-import { Decimal } from "@prisma/client/runtime/client";
+import { OrderStatus } from "@/generated/prisma/client";
+import { Decimal } from "@/generated/prisma/client/runtime/client";
 
 export const demoOrders: {
   id: string;
@@ -11,6 +11,7 @@ export const demoOrders: {
   riderId: string | null;
   totalAmount: Decimal;
   deliveryAddress: string;
+  packTypeId: string | null; // 👈 add here
 }[] = [
   {
     id: "clx001order1",
@@ -22,6 +23,7 @@ export const demoOrders: {
     deliveryAddress: "12 Adeniran Ogunsanya St, Surulere, Lagos",
     createdAt: new Date("2026-07-10T12:30:00Z"),
     updatedAt: new Date("2026-07-10T13:15:00Z"),
+    packTypeId: null, // 👈 add to each order
   },
   {
     id: "clx002order2",
@@ -33,6 +35,7 @@ export const demoOrders: {
     deliveryAddress: "45 Ademola Adetokunbo Cres, Wuse 2, Abuja",
     createdAt: new Date("2026-07-13T09:05:00Z"),
     updatedAt: new Date("2026-07-13T09:05:00Z"),
+    packTypeId: null,
   },
   {
     id: "clx003order3",
@@ -44,6 +47,7 @@ export const demoOrders: {
     deliveryAddress: "7 Okpara Ave, GRA, Enugu",
     createdAt: new Date("2026-07-13T11:00:00Z"),
     updatedAt: new Date("2026-07-13T11:45:00Z"),
+    packTypeId: null,
   },
   {
     id: "clx004order4",
@@ -55,6 +59,7 @@ export const demoOrders: {
     deliveryAddress: "23 Bodija Rd, Ibadan, Oyo State",
     createdAt: new Date("2026-07-09T18:20:00Z"),
     updatedAt: new Date("2026-07-09T18:40:00Z"),
+    packTypeId: null,
   },
   {
     id: "clx005order5",
@@ -66,6 +71,7 @@ export const demoOrders: {
     deliveryAddress: "88 Aba Rd, Port Harcourt, Rivers State",
     createdAt: new Date("2026-07-13T13:10:00Z"),
     updatedAt: new Date("2026-07-13T13:10:00Z"),
+    packTypeId: null,
   },
 ];
 

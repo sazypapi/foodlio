@@ -49,7 +49,8 @@ function VendorApplicationsTable({ vendors }: Props) {
               <TableRow>
                 <TableCell
                   colSpan={6}
-                  className="text-center py-12 text-gray-400">
+                  className="text-center py-12 text-gray-400"
+                >
                   No applications found
                 </TableCell>
               </TableRow>
@@ -85,7 +86,8 @@ function VendorApplicationsTable({ vendors }: Props) {
                       {vendor.cuisineType.slice(0, 2).map((c) => (
                         <span
                           key={c}
-                          className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                          className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
+                        >
                           {c}
                         </span>
                       ))}
@@ -105,7 +107,8 @@ function VendorApplicationsTable({ vendors }: Props) {
                   <TableCell>
                     <Badge
                       variant="outline"
-                      className={`text-xs capitalize ${statusStyles[vendor.status]}`}>
+                      className={`text-xs capitalize ${statusStyles[vendor.status]}`}
+                    >
                       {vendor.status.toLowerCase()}
                     </Badge>
                   </TableCell>
@@ -119,7 +122,8 @@ function VendorApplicationsTable({ vendors }: Props) {
                       variant="link"
                       asChild
                       className="text-muted-foreground hover:text-black transition dura"
-                      size="sm">
+                      size="sm"
+                    >
                       <Link href={`/admin/vendors/${vendor.id}`}>
                         Actions <ArrowUpRightIcon />
                       </Link>

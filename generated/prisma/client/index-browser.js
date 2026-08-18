@@ -124,6 +124,7 @@ exports.Prisma.VendorScalarFieldEnum = {
   id: 'id',
   clerkUserId: 'clerkUserId',
   name: 'name',
+  slug: 'slug',
   description: 'description',
   logo: 'logo',
   address: 'address',
@@ -138,20 +139,83 @@ exports.Prisma.VendorScalarFieldEnum = {
   backUpPhoneNumber: 'backUpPhoneNumber',
   email: 'email',
   adminNote: 'adminNote',
-  closeOpenStatus: 'closeOpenStatus'
+  closeOpenStatus: 'closeOpenStatus',
+  minimumPrice: 'minimumPrice'
+};
+
+exports.Prisma.CategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  vendorId: 'vendorId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.MenuItemScalarFieldEnum = {
   id: 'id',
   vendorId: 'vendorId',
+  categoryId: 'categoryId',
   name: 'name',
+  slug: 'slug',
   description: 'description',
   price: 'price',
   image: 'image',
-  category: 'category',
   isAvailable: 'isAvailable',
+  discount: 'discount',
+  addProteinOptions: 'addProteinOptions',
+  addCarbohydrateOptions: 'addCarbohydrateOptions',
+  addSides: 'addSides',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CarbOptionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  extraPrice: 'extraPrice',
+  isAvailable: 'isAvailable',
+  vendorId: 'vendorId'
+};
+
+exports.Prisma.PackTypeScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  extraPrice: 'extraPrice',
+  isAvailable: 'isAvailable',
+  vendorId: 'vendorId'
+};
+
+exports.Prisma.OrderItemCarbScalarFieldEnum = {
+  id: 'id',
+  orderItemId: 'orderItemId',
+  carbOptionId: 'carbOptionId'
+};
+
+exports.Prisma.SideOptionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  extraPrice: 'extraPrice',
+  isAvailable: 'isAvailable',
+  vendorId: 'vendorId'
+};
+
+exports.Prisma.OrderItemSideScalarFieldEnum = {
+  id: 'id',
+  orderItemId: 'orderItemId',
+  sideOptionId: 'sideOptionId'
+};
+
+exports.Prisma.ProteinOptionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  extraPrice: 'extraPrice',
+  isAvailable: 'isAvailable',
+  vendorId: 'vendorId'
 };
 
 exports.Prisma.RiderScalarFieldEnum = {
@@ -160,8 +224,6 @@ exports.Prisma.RiderScalarFieldEnum = {
   phone: 'phone',
   vehicleType: 'vehicleType',
   isAvailable: 'isAvailable',
-  latitude: 'latitude',
-  longitude: 'longitude',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -176,7 +238,8 @@ exports.Prisma.OrderScalarFieldEnum = {
   totalAmount: 'totalAmount',
   deliveryAddress: 'deliveryAddress',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  packTypeId: 'packTypeId'
 };
 
 exports.Prisma.OrderItemScalarFieldEnum = {
@@ -185,6 +248,7 @@ exports.Prisma.OrderItemScalarFieldEnum = {
   menuItemId: 'menuItemId',
   quantity: 'quantity',
   unitPrice: 'unitPrice',
+  proteinOptionId: 'proteinOptionId',
   createdAt: 'createdAt'
 };
 
@@ -234,7 +298,14 @@ exports.OrderStatus = exports.$Enums.OrderStatus = {
 
 exports.Prisma.ModelName = {
   Vendor: 'Vendor',
+  Category: 'Category',
   MenuItem: 'MenuItem',
+  CarbOption: 'CarbOption',
+  PackType: 'PackType',
+  OrderItemCarb: 'OrderItemCarb',
+  SideOption: 'SideOption',
+  OrderItemSide: 'OrderItemSide',
+  ProteinOption: 'ProteinOption',
   Rider: 'Rider',
   Order: 'Order',
   OrderItem: 'OrderItem'

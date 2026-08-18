@@ -31,7 +31,8 @@ function CuisineSelect({
         <button
           type="button"
           onClick={() => setOpen(!open)}
-          className="w-full flex items-center justify-between rounded-sm px-2.5 py-1 shadow-gray-300 shadow-sm/30 border-2 border-gray-300 placeholder:text-[16px] text-[16px]">
+          className="w-full flex items-center justify-between rounded-sm px-2.5 py-1 border placeholder:text-[16px] text-[16px]"
+        >
           <span className="text-gray-500">
             {value.length === 0
               ? "Select cuisine types"
@@ -47,7 +48,8 @@ function CuisineSelect({
             {value.map((cuisine) => (
               <span
                 key={cuisine}
-                className="flex items-center gap-1 bg-black text-white text-xs px-3 py-1 rounded-full">
+                className="flex items-center gap-1 bg-black text-white text-xs px-3 py-1 rounded-full"
+              >
                 {cuisine}
                 <button type="button" onClick={() => toggle(cuisine)}>
                   <X className="w-3 h-3" />
@@ -72,7 +74,8 @@ function CuisineSelect({
                   className={cn(
                     "w-full text-left px-4 py-2 text-sm hover:bg-zinc-50 transition-colors flex items-center justify-between",
                     value.includes(cuisine) && "font-medium",
-                  )}>
+                  )}
+                >
                   {cuisine}
                   {value.includes(cuisine) && (
                     <span className="w-2 h-2 rounded-full bg-black" />

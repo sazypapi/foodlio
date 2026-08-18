@@ -5,10 +5,17 @@ import { db } from "@/lib/prisma";
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { ZodError } from "zod";
-import { vendorApplicationSchema } from "./schemas";
+import {
+  editAdminNoteSchema,
+  editVendorDetailsSchema,
+  finsihSettingUpAccountScheme,
+  menuItemSchema,
+  vendorApplicationSchema,
+} from "./schemas";
 import { backendClient } from "@/lib/edgestore-server";
 import { resend } from "@/lib/resend";
 import { revalidatePath } from "next/cache";
+import { VendorStatus } from "@/generated/prisma/client";
 const renderError = (error: unknown): { message: string } => {
   console.log(error);
   if (error instanceof ZodError) {
@@ -19,7 +26,6 @@ const renderError = (error: unknown): { message: string } => {
     message: error instanceof Error ? error.message : "an error occured",
   };
 };
-
 export const isUserApplicationExists = async () => {
   const user = await currentUser();
   return await db.vendor.findUnique({
@@ -59,11 +65,15 @@ export const submitVendorApplicationForm = async (
     await backendClient.publicFiles.confirmUpload({
       url: validatedFields.logo,
     });
+    const slug = validatedFields.name
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-");
     await db.vendor.create({
       data: {
         ...validatedFields,
         clerkUserId: user?.id,
         backUpPhoneNumber: finalBackUpNumber,
+        slug,
       },
     });
 
@@ -117,7 +127,6 @@ export const submitVendorApplicationForm = async (
   }
   redirect("/vendor-application/status");
 };
-
 export const approveVendorApplication = async (
   prevState: any,
   formData: FormData,
@@ -161,9 +170,26 @@ export const approveVendorApplication = async (
     return renderError(error);
   }
 };
-export const getAllVendorApplications = async () => {
+export const getAllVendorApplications = async (filters: {
+  status?: string;
+  search?: string;
+}) => {
+  const { status, search } = filters;
+
   return await db.vendor.findMany({
-    include: {},
+    where: {
+      ...(status &&
+        status !== "ALL" && {
+          status: status as VendorStatus,
+        }),
+      ...(search && {
+        OR: [
+          { name: { contains: search, mode: "insensitive" } },
+          { email: { contains: search, mode: "insensitive" } },
+          { address: { contains: search, mode: "insensitive" } },
+        ],
+      }),
+    },
     orderBy: { createdAt: "desc" },
   });
 };
@@ -272,7 +298,6 @@ export const rejectVendorApplication = async (
     return renderError(error);
   }
 };
-
 export const suspendVendor = async (
   prevState: any,
   formData: FormData,
@@ -331,7 +356,6 @@ export const suspendVendor = async (
     return renderError(error);
   }
 };
-
 export const reinstateVendor = async (
   prevState: any,
   formData: FormData,
@@ -379,10 +403,7 @@ export const reinstateVendor = async (
 };
 export const getVendorByClerkId = async () => {
   const user = await currentUser();
-  if (!user) {
-    redirect("/sign-in?redirect_url=/vendor/dashboard");
-  }
-  if (user.publicMetadata.role !== "VENDOR") {
+  if (user?.publicMetadata.role !== "VENDOR") {
     redirect("/vendor-application");
   }
   const vendor = await db.vendor.findUnique({
@@ -394,4 +415,374 @@ export const getVendorByClerkId = async () => {
     redirect("/vendor-application");
   }
   return vendor;
+};
+export const toggleRestaurantOnAndOff = async (params: {
+  clerkId: string;
+  toggleValueString: string;
+}) => {
+  try {
+    const toggleValue = params.toggleValueString === "true";
+    await db.vendor.update({
+      where: { clerkUserId: params.clerkId },
+      data: { closeOpenStatus: toggleValue },
+    });
+    revalidatePath(`/vendor/dashboard`);
+    return { message: "Restaurant status updated successfully" };
+  } catch (error) {
+    return renderError(error);
+  }
+};
+export const createMealAction = async (
+  prevState: any,
+  formData: FormData,
+): Promise<{ message: string }> => {
+  let validatedFields: any;
+  let uploadConfirmed = false;
+
+  try {
+    const rawData = Object.fromEntries(formData);
+    const vendorId = rawData.vendorId.toString();
+    const isVendorExists = await db.vendor.findUnique({
+      where: { id: vendorId },
+      include: { menuItems: true },
+    });
+
+    if (!isVendorExists) {
+      return { message: "There was an error, try again" };
+    }
+    const categoryName = formData.get("category") as string;
+    const getExistingCategory = await db.category.findFirst({
+      where: {
+        name: categoryName,
+        vendorId: vendorId,
+      },
+    });
+    let categoryId: string | null = null;
+    if (getExistingCategory === null) {
+      categoryId = null;
+    } else {
+      const normalized = categoryName.toLowerCase().trim();
+      const slug = normalized.replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-");
+      const newCategory = await db.category.upsert({
+        where: {
+          vendorId_name: {
+            vendorId: vendorId,
+            name: normalized,
+          },
+        },
+        update: {},
+        create: { name: normalized, slug, vendorId },
+      });
+      categoryId = newCategory.id;
+    }
+    validatedFields = menuItemSchema.parse({
+      ...rawData,
+      categoryId: categoryId,
+      isAvailable: rawData.isAvailable === "on",
+      addProteinOptions: rawData.addProteinOptions === "on",
+      addCarbohydrateOptions: rawData.addCarbohydrateOptions === "on",
+      addSides: rawData.addSides === "on",
+      discount: rawData.discount === "" ? undefined : rawData.discount,
+    });
+
+    const normalizedNewName = validatedFields.name
+      .toLowerCase()
+      .replace(/\s+/g, "");
+    const existingNameArrays = isVendorExists.menuItems.map((item) =>
+      item.name.toLowerCase().replace(/\s+/g, ""),
+    );
+    const isDuplicate = existingNameArrays.includes(normalizedNewName);
+    if (isDuplicate) {
+      return {
+        message:
+          "You have a menu item called " + validatedFields.name + " already",
+      };
+    }
+
+    await backendClient.publicFiles.confirmUpload({
+      url: validatedFields.image,
+    });
+    uploadConfirmed = true;
+
+    await db.menuItem.create({
+      data: {
+        ...validatedFields,
+        vendorId,
+      },
+    });
+  } catch (error) {
+    if (uploadConfirmed && validatedFields?.image) {
+      try {
+        await backendClient.publicFiles.deleteFile({
+          url: validatedFields.image,
+        });
+      } catch (cleanupError) {
+        console.error("Failed to clean up orphaned upload:", cleanupError);
+      }
+    }
+    return renderError(error);
+  }
+  redirect("/vendor/manage-menu");
+};
+export const getAllMenuItems = async (
+  vendorId: string,
+  filters?: { search?: string; availability?: string },
+) => {
+  const { search, availability } = filters ?? {};
+
+  return await db.menuItem.findMany({
+    where: {
+      ...(availability === "AVAILABLE" && { isAvailable: true }),
+      ...(availability === "UNAVAILABLE" && { isAvailable: false }),
+      ...(search && {
+        OR: [
+          { name: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ],
+      }),
+      vendorId: vendorId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+export const getSingleMenuItem = async (id: string) => {
+  return await db.menuItem.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      orderItems: true,
+    },
+  });
+};
+export const editMenuItem = async (
+  prevState: any,
+  formData: FormData,
+): Promise<{ message: string }> => {
+  let uploadConfirmed = false;
+  let validatedFields: any;
+  let id;
+  try {
+    const rawData = Object.fromEntries(formData);
+    id = rawData.mealId.toString();
+    const menuItem = await db.menuItem.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!menuItem) {
+      return { message: "There was an error, try again" };
+    }
+    validatedFields = menuItemSchema.parse({
+      ...rawData,
+      category: formData.getAll("category") as string[],
+      isAvailable: rawData.isAvailable === "on",
+      addProteinOptions: rawData.addProteinOptions === "on",
+      addCarbohydrateOptions: rawData.addCarbohydrateOptions === "on",
+      addSides: rawData.addSides === "on",
+      discount: rawData.discount === "" ? undefined : rawData.discount,
+    });
+
+    const otherMenuItems = await db.menuItem.findMany({
+      where: {
+        vendorId: menuItem.vendorId,
+        NOT: { id },
+      },
+    });
+
+    const normalizedNewName = validatedFields.name
+      .toLowerCase()
+      .replace(/\s+/g, "");
+    const existingNameArrays = otherMenuItems.map((item) =>
+      item.name.toLowerCase().replace(/\s+/g, ""),
+    );
+
+    const isDuplicate = existingNameArrays.includes(normalizedNewName);
+    if (isDuplicate) {
+      return {
+        message:
+          "You have a menu item called " + validatedFields.name + " already",
+      };
+    }
+    if (!(menuItem.image === validatedFields.image)) {
+      await backendClient.publicFiles.confirmUpload({
+        url: validatedFields.image,
+      });
+      uploadConfirmed = true;
+    }
+    await db.menuItem.update({
+      where: {
+        id,
+      },
+      data: { ...validatedFields },
+    });
+    // return { message: "Edit Successful" };
+  } catch (error) {
+    if (uploadConfirmed && validatedFields?.image) {
+      try {
+        await backendClient.publicFiles.deleteFile({
+          url: validatedFields.image,
+        });
+      } catch (cleanupError) {
+        console.error("Failed to clean up orphaned upload:", cleanupError);
+      }
+    }
+    return renderError(error);
+  }
+  redirect(`/vendor/manage-menu/${id}`);
+};
+export const canRestaurantBeOpened = async (): Promise<{
+  canOpen: boolean;
+  reason: string;
+}> => {
+  const vendor = await getVendorByClerkId();
+  if (!vendor) {
+    redirect("/");
+  }
+  const isRestaurantFullySetUp: boolean =
+    vendor.images.length > 0 && vendor.minimumPrice != null;
+  if (!isRestaurantFullySetUp) {
+    return { canOpen: false, reason: "setup" };
+  }
+  const vendorsMeals = await db.menuItem.count({
+    where: {
+      vendorId: vendor.id,
+    },
+  });
+  if (vendorsMeals < 3) {
+    return { canOpen: false, reason: "menu" };
+  }
+  return { canOpen: true, reason: "All good" };
+};
+export const finsihSettingUpAccount = async (
+  prevState: any,
+  formData: FormData,
+): Promise<{ message: string }> => {
+  const vendor = await getVendorByClerkId();
+  if (!vendor) {
+    redirect("/");
+  }
+  const confirmedImages: string[] = [];
+  let validatedFields: any;
+  try {
+    const rawData = Object.fromEntries(formData);
+    validatedFields = finsihSettingUpAccountScheme.parse(rawData);
+    for (const imageUrl of validatedFields.images) {
+      await backendClient.publicFiles.confirmUpload({ url: imageUrl });
+      confirmedImages.push(imageUrl);
+    }
+
+    await db.vendor.update({
+      where: { id: vendor.id },
+      data: { ...validatedFields },
+    });
+  } catch (error) {
+    if (confirmedImages.length > 0) {
+      await Promise.allSettled(
+        confirmedImages.map((url) =>
+          backendClient.publicFiles.deleteFile({ url }),
+        ),
+      );
+    }
+    return renderError(error);
+  }
+
+  redirect("/vendor/manage-store");
+};
+export const getVendorsCategory = async () => {
+  const vendor = await getVendorByClerkId();
+  return await db.category.findMany({
+    where: {
+      vendorId: vendor.id,
+    },
+    include: {
+      menuItems: true,
+    },
+  });
+};
+export const editVendorDetails = async (
+  prevState: any,
+  formData: FormData,
+): Promise<{ message: string }> => {
+  const vendor = await getVendorByClerkId();
+  if (!vendor) {
+    redirect("/");
+  }
+
+  const confirmedImages: string[] = [];
+  let validatedFields: any;
+
+  try {
+    const rawData = Object.fromEntries(formData);
+
+    let editedUrls: string[] = [];
+    if (typeof rawData.editedUrls === "string") {
+      try {
+        editedUrls = JSON.parse(rawData.editedUrls);
+      } catch {
+        editedUrls = [];
+      }
+    }
+
+    let newImages: string[] = [];
+    if (typeof rawData.images === "string") {
+      try {
+        newImages = JSON.parse(rawData.images);
+      } catch {
+        newImages = [];
+      }
+    }
+
+    const finalImages = [...editedUrls, ...newImages];
+    if (!finalImages.length) {
+      return { message: "There must be at least 1 vendor image" };
+    }
+
+    validatedFields = editVendorDetailsSchema.parse({
+      ...rawData,
+      cuisineType: formData.getAll("cuisineType") as string[],
+      images: finalImages,
+    });
+    console.log(
+      "cuisineType via getAll 2 log:",
+      formData.getAll("cuisineType"),
+    );
+
+    for (const imageUrl of newImages) {
+      await backendClient.publicFiles.confirmUpload({ url: imageUrl });
+      confirmedImages.push(imageUrl);
+    }
+
+    const removedImages = vendor.images.filter(
+      (img) => !editedUrls.includes(img),
+    );
+    if (removedImages.length > 0) {
+      await Promise.allSettled(
+        removedImages.map((url) =>
+          backendClient.publicFiles.deleteFile({ url }),
+        ),
+      );
+    }
+
+    await db.vendor.update({
+      where: { id: vendor.id },
+      data: { ...validatedFields },
+    });
+    revalidatePath("/vendor/manage-store");
+
+    return { message: "Your details have been updated" };
+  } catch (error) {
+    if (confirmedImages.length > 0) {
+      await Promise.allSettled(
+        confirmedImages.map((url) =>
+          backendClient.publicFiles.deleteFile({ url }),
+        ),
+      );
+    }
+    return renderError(error);
+  }
+
+  // redirect("/vendor/manage-store");
 };

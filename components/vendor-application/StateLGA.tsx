@@ -66,7 +66,7 @@ export default function StateLgaSelect({
             type="text"
             placeholder="Pick a state first"
             disabled
-            className="shadow-gray-300 py-4 shadow-sm/30 border-2 border-gray-300 placeholder:text-[16px] text-[16px] rounded-sm"
+            className="shadow-gray-300 py-4 border placeholder:text-[16px] text-[16px] rounded-sm"
           />
         )}
       </div>

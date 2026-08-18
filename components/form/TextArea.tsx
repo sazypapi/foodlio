@@ -25,7 +25,8 @@ function TextArea({
     <div className={cn("mb-2", className)}>
       <Label
         htmlFor={name}
-        className="capitalize mb-1 sm:mb-2 text-xs sm:text-sm">
+        className="capitalize mb-1 sm:mb-2 text-xs sm:text-sm"
+      >
         {labelText || name}
       </Label>
       <Textarea
@@ -37,7 +38,7 @@ function TextArea({
         placeholder={placeholder}
         required
         className={cn(
-          "leading-loose border-2 border-gray-300 text-[16px] placeholder:text-[16px]",
+          "leading-loose border text-[16px] placeholder:text-[16px]",
           textAreaInput,
         )}
       />

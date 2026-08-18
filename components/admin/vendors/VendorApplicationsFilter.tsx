@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { Input } from "@/components/ui/input";
@@ -10,8 +11,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { SlidersHorizontal, Search } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import { VendorStatus } from "@/generated/prisma/client";
 
 const statuses: { label: string; value: VendorStatus | "ALL" }[] = [
@@ -22,10 +24,52 @@ const statuses: { label: string; value: VendorStatus | "ALL" }[] = [
   { label: "Suspended", value: "SUSPENDED" },
 ];
 
+function SearchInput({ placeholder }: { placeholder: string }) {
+  const pathname = usePathname();
+  const { replace } = useRouter();
+  const searchParams = useSearchParams();
+  const [search, setSearch] = useState(
+    searchParams.get("search")?.toString() || "",
+  );
+
+  const handleSearch = useDebouncedCallback((value: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (value) {
+      params.set("search", value);
+    } else {
+      params.delete("search");
+    }
+    replace(`${pathname}?${params.toString()}`);
+  }, 500);
+
+  const searchValue = searchParams.get("search");
+
+  useEffect(() => {
+    if (!searchValue) {
+      setSearch("");
+    }
+  }, [searchValue]);
+
+  return (
+    <div className="relative flex-1">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+      <Input
+        placeholder={placeholder}
+        className="pl-9 rounded-sm border-gray-200"
+        value={search}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          handleSearch(e.target.value);
+        }}
+      />
+    </div>
+  );
+}
+
 function FilterControls() {
+  const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [search, setSearch] = useState(searchParams.get("search") ?? "");
   const currentStatus = searchParams.get("status") ?? "ALL";
 
   const updateParams = useCallback(
@@ -36,25 +80,14 @@ function FilterControls() {
       } else {
         params.set(key, value);
       }
-      router.push(`?${params.toString()}`);
+      router.push(`${pathname}?${params.toString()}`);
     },
-    [searchParams, router],
+    [searchParams, router, pathname],
   );
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <Input
-          placeholder="Search by name, email or address..."
-          className="pl-9 rounded-sm border-gray-200"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") updateParams("search", search);
-          }}
-        />
-      </div>
+      <SearchInput placeholder="Search by name, email or address..." />
       <div className="flex flex-wrap gap-2">
         {statuses.map((s) => (
           <button
@@ -64,7 +97,8 @@ function FilterControls() {
               currentStatus === s.value
                 ? "bg-blue-600 text-white border-blue-600"
                 : "bg-white text-gray-600 border-gray-200 hover:border-blue-300"
-            }`}>
+            }`}
+          >
             {s.label}
           </button>
         ))}
@@ -83,27 +117,14 @@ function VendorApplicationsFilter() {
 
       {/* Mobile */}
       <div className="sm:hidden flex gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Search..."
-            className="pl-9 rounded-sm border-gray-200"
-            onKeyDown={(e) => {
-              const target = e.target as HTMLInputElement;
-              if (e.key === "Enter") {
-                const params = new URLSearchParams(window.location.search);
-                params.set("search", target.value);
-                window.location.search = params.toString();
-              }
-            }}
-          />
-        </div>
+        <SearchInput placeholder="Search..." />
         <Sheet>
           <SheetTrigger asChild>
             <Button
               variant="outline"
               size="icon"
-              className="rounded-sm border-gray-200">
+              className="rounded-sm border-gray-200"
+            >
               <SlidersHorizontal className="h-4 w-4" />
             </Button>
           </SheetTrigger>

@@ -13,7 +13,6 @@ import { formatCurrency } from "@/utils/format";
 import { Order, OrderStatus } from "@/generated/prisma/client";
 import {
   Empty,
-  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
@@ -21,7 +20,6 @@ import {
 } from "@/components/ui/empty";
 import { RxValueNone } from "react-icons/rx";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 const statusStyles: Record<OrderStatus, string> = {
   PENDING_PAYMENT: "bg-gray-100 text-gray-600 hover:bg-gray-100",
@@ -44,6 +42,7 @@ const statusLabels: Record<OrderStatus, string> = {
   DELIVERED: "Delivered",
   CANCELLED: "Cancelled",
 };
+type SerializedOrder = Omit<Order, "totalAmount"> & { totalAmount: number };
 
 function timeAgo(date: Date) {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -60,11 +59,9 @@ function RecentOrders({
   orders,
   customerName,
 }: {
-  orders: Order[];
+  orders: SerializedOrder[];
   customerName?: string;
 }) {
-  const router = useRouter();
-
   if (orders.length === 0) {
     return (
       <div className="rounded-lg border px-3 pt-2 mt-5">
@@ -105,32 +102,51 @@ function RecentOrders({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {orders.map((order) => (
-            <TableRow
-              key={order.id}
-              onClick={() => router.push(`/vendor/orders/${order.id}`)}>
-              {/* <Link href={`/vendor/orders/${order.id}`}> */}
-              <TableCell className="font-medium hidden sm:table-cell">
-                #{order.id.slice(-6).toUpperCase()}
-              </TableCell>{" "}
-              {/* </Link> */}
-              <TableCell>{customerName ?? "Customer"}</TableCell>
-              <TableCell className="text-muted-foreground">2</TableCell>
-              <TableCell className="text-right hidden sm:table-cell">
-                {formatCurrency(order.totalAmount.toNumber())}
-              </TableCell>
-              <TableCell>
-                <Badge
-                  variant="secondary"
-                  className={cn("font-normal", statusStyles[order.status])}>
-                  {statusLabels[order.status]}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-right text-muted-foreground hidden sm:table-cell">
-                {timeAgo(order.createdAt)}
-              </TableCell>
-            </TableRow>
-          ))}
+          {orders.map((order) => {
+            const href = `/vendor/orders/${order.id}`;
+            return (
+              <TableRow key={order.id} className="cursor-pointer">
+                <TableCell className="font-medium hidden sm:table-cell p-0">
+                  <Link href={href} className="block w-full h-full px-4 py-2">
+                    #{order.id.slice(-6).toUpperCase()}
+                  </Link>
+                </TableCell>
+                <TableCell className="p-0">
+                  <Link href={href} className="block w-full h-full px-4 py-2">
+                    {customerName ?? "Customer"}
+                  </Link>
+                </TableCell>
+                <TableCell className="text-muted-foreground p-0">
+                  <Link href={href} className="block w-full h-full px-4 py-2">
+                    2
+                  </Link>
+                </TableCell>
+                <TableCell className="text-right hidden sm:table-cell p-0">
+                  <Link href={href} className="block w-full h-full px-4 py-2">
+                    {formatCurrency(order.totalAmount)}
+                  </Link>
+                </TableCell>
+                <TableCell className="p-0">
+                  <Link
+                    href={href}
+                    className="flex w-full h-full items-center px-4 py-2"
+                  >
+                    <Badge
+                      variant="secondary"
+                      className={cn("font-normal", statusStyles[order.status])}
+                    >
+                      {statusLabels[order.status]}
+                    </Badge>
+                  </Link>
+                </TableCell>
+                <TableCell className="text-right text-muted-foreground hidden sm:table-cell p-0">
+                  <Link href={href} className="block w-full h-full px-4 py-2">
+                    {timeAgo(order.createdAt)}
+                  </Link>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

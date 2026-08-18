@@ -62,9 +62,10 @@ export function CustomSelect({
         disabled={disabled}
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          "flex w-full items-center justify-between rounded-sm border-2 border-gray-300 shadow-gray-300 shadow-sm/30 px-3 py-1 text-[16px] disabled:cursor-not-allowed disabled:opacity-50 bg-background",
+          "flex w-full items-center justify-between rounded-sm border px-3 py-1 text-[16px] disabled:cursor-not-allowed disabled:opacity-50 bg-background",
           className,
-        )}>
+        )}
+      >
         <span className={cn(!selectedLabel && "text-muted-foreground")}>
           {selectedLabel ?? placeholder}
         </span>
@@ -79,7 +80,8 @@ export function CustomSelect({
       {open && (
         <div
           role="listbox"
-          className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-sm border-2 border-gray-300 bg-background shadow-md">
+          className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-sm border-2 border-gray-300 bg-background shadow-md"
+        >
           {options.length === 0 ? (
             <div className="px-3 py-2 text-sm text-muted-foreground">
               No options
@@ -97,7 +99,8 @@ export function CustomSelect({
                 className={cn(
                   "cursor-pointer px-3 py-2 text-[16px] hover:bg-accent hover:text-accent-foreground",
                   option.value === value && "bg-accent text-accent-foreground",
-                )}>
+                )}
+              >
                 {option.label}
               </div>
             ))

@@ -9,11 +9,11 @@ import {
 } from "@/components/ui/empty";
 import { Button } from "@/components/ui/button";
 
-import { IconFolderCode } from "@tabler/icons-react";
 import Link from "next/link";
 import BacktoVendorPage from "@/components/admin/vendors/vendor-details/BacktoVendorPage";
 import Header from "@/components/admin/vendors/vendor-details/Header";
 import Body from "@/components/admin/vendors/vendor-details/Body";
+import { RxValueNone } from "react-icons/rx";
 
 async function VendorDetails({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -23,11 +23,11 @@ async function VendorDetails({ params }: { params: Promise<{ id: string }> }) {
       <Empty>
         <EmptyHeader>
           <EmptyMedia variant="icon">
-            <IconFolderCode />
+            <RxValueNone />
           </EmptyMedia>
-          <EmptyTitle>No Projects Yet</EmptyTitle>
+          <EmptyTitle>No Record found</EmptyTitle>
           <EmptyDescription>
-            This vendor application doesn&apos;t exist.
+            The requested vendor or vendor application could not be found.
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent className="flex-row justify-center gap-2">

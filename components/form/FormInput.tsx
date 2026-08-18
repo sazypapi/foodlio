@@ -3,7 +3,7 @@ type FormInputProps = {
   name: string;
   type: string;
   label?: string;
-  defaultValue?: string;
+  defaultValue?: string | number;
   placeholder?: string;
   required?: boolean;
   className?: string;
@@ -33,7 +33,8 @@ function FormInput({
           "capitalize mb-1 sm:mb-2 text-xs sm:text-sm",
           labelClassName,
         )}
-        htmlFor={name}>
+        htmlFor={name}
+      >
         {label || name}
       </Label>
       <Input
@@ -41,10 +42,7 @@ function FormInput({
         name={name}
         type={type}
         // className="shadow-gray-300 shadow-sm/30 border-2 border-gray-300"
-        className={cn(
-          "shadow-gray-300 shadow-sm/30 border-2 border-gray-300 placeholder:text-[16px] text-[16px]",
-          className,
-        )}
+        className={cn("border placeholder:text-[16px] text-[16px]", className)}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
