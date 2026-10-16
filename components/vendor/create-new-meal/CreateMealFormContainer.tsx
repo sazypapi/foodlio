@@ -53,7 +53,7 @@ function CreateMealFormContainer({
               className="capitalize bg-white text-black hover:bg-black hover:text-white transition-all duration-300 border-2 border-black mt-5"
               disabled
             >
-              Upload your logo to submit
+              Upload your logo to create meal
             </Button>
           )}
         </div>

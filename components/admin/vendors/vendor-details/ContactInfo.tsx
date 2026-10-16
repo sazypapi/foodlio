@@ -1,7 +1,7 @@
-import { Vendor } from "@/generated/prisma/client";
+import { serializedVendor } from "@/components/vendor/create-new-meal/CreateMealFormContainer";
 import { Mail, MapPin, Phone, PhoneCall } from "lucide-react";
 
-function ContactInfo({ vendorData }: { vendorData: Vendor }) {
+function ContactInfo({ vendorData }: { vendorData: serializedVendor }) {
   return (
     <div className="border border-gray-200 rounded-lg p-4">
       <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">

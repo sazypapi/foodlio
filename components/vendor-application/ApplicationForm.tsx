@@ -8,6 +8,7 @@ import ApplicationFormLogo from "./ApplicationFormLogo";
 import { SubmitButton } from "../form/Buttons";
 import { Button } from "../ui/button";
 import StateLgaSelect from "./StateLGA";
+import VendorLocationPicker from "../vendor/manage-store/VendorLocationPicker";
 
 function ApplicationForm() {
   const [cuisines, setCuisines] = useState<CuisineType[]>([]);
@@ -31,7 +32,10 @@ function ApplicationForm() {
         />
         <CuisineSelect value={cuisines} onChange={setCuisines} />
       </div>
-      <StateLgaSelect onStateChange={setSelectedState} />
+      <div className="grid-cols-1 gap-y-3 sm:gap-y-6 mt-3">
+        <VendorLocationPicker />
+        <StateLgaSelect onStateChange={setSelectedState} />
+      </div>
       <TextArea
         name="address"
         labelText="Address"
@@ -43,7 +47,7 @@ function ApplicationForm() {
       <TextArea
         name="description"
         labelText="Description"
-        placeholder="Describe your establishment"
+        placeholder="Tell us about your establishment"
         textAreaInput="rounded-sm"
         className="mb-0 mt-3"
       />

@@ -6,9 +6,13 @@ import {
   rejectVendorApplication,
   suspendVendor,
 } from "@/utils/actions";
-import { Vendor } from "@/generated/prisma/client";
+import { serializedVendor } from "@/components/vendor/create-new-meal/CreateMealFormContainer";
 
-export default function StatusActions({ vendor }: { vendor: Vendor }) {
+export default function StatusActions({
+  vendor,
+}: {
+  vendor: serializedVendor;
+}) {
   if (vendor.status === "PENDING") {
     return (
       <div className="flex gap-2 shrink-0">

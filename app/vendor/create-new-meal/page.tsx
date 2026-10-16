@@ -10,7 +10,7 @@ async function CreateNewMealPage() {
   const vendorCategory = await getVendorsCategory();
   const serializedVendor: serializedVendor = {
     ...vendor,
-    minimumPrice: vendor.minimumPrice?.toNumber(),
+    minimumPrice: vendor.minimumPrice ? vendor.minimumPrice.toNumber() : null,
   };
   return (
     <div>

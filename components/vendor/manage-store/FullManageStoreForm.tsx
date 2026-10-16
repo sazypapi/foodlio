@@ -14,6 +14,7 @@ import { editVendorDetails } from "@/utils/actions";
 import { SubmitButton } from "@/components/form/Buttons";
 import { Button } from "@/components/ui/button";
 import EditStateLGA from "./EditStateLGA";
+import VendorLocationPicker from "./VendorLocationPicker";
 
 function FullManageStoreForm({ vendor }: { vendor: serializedVendor }) {
   const [cuisines, setCuisines] = useState<CuisineType[]>(
@@ -53,6 +54,14 @@ function FullManageStoreForm({ vendor }: { vendor: serializedVendor }) {
         className="mb-0 mt-3"
         defaultValue={vendor.address}
       />
+      <div className="mt-3">
+        <VendorLocationPicker
+          initialLat={vendor.latitude ?? undefined}
+          initialLng={vendor.longitude ?? undefined}
+          initialLandmark={vendor.landmark ?? ""}
+          showMapLink
+        />
+      </div>
       <TextArea
         defaultValue={vendor.description}
         name="description"

@@ -6,17 +6,20 @@ import { Label } from "@/components/ui/label";
 
 export default function CreatableSelect({
   category,
+  selectedCategory,
 }: {
   category: Category[];
+  selectedCategory?: string;
 }) {
   const categoryNames = category.map((category) => category.name);
   const [options, setOptions] = useState<string[]>(categoryNames);
-  const [selected, setSelected] = useState<string>("");
+  const [selected, setSelected] = useState<string>(
+    selectedCategory ? selectedCategory : "",
+  );
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (
@@ -77,7 +80,7 @@ export default function CreatableSelect({
       <Label className="capitalize mb-1 sm:mb-2 text-xs sm:text-sm">
         Category
       </Label>
-      <input type="hidden" name="category" value={selected} />
+      <input type="hidden" name="categoryName" value={selected} />
       <div className="relative" ref={containerRef}>
         <button
           type="button"

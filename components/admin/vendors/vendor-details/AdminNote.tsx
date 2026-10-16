@@ -1,5 +1,4 @@
 "use client";
-import { Vendor } from "@/generated/prisma/client";
 import {
   CustomDialog,
   CustomDialogContent,
@@ -8,13 +7,13 @@ import {
   CustomDialogTrigger,
 } from "@/components/ui/custom-dialog";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { FiEdit } from "react-icons/fi";
 import FormContainer from "@/components/form/FormContainer";
 import { deleteAdminNote, editAdminNote } from "@/utils/actions";
 import TextArea from "@/components/form/TextArea";
 import { IconButton, SubmitButton } from "@/components/form/Buttons";
-function AdminNote({ vendorData }: { vendorData: Vendor }) {
+import { serializedVendor } from "@/components/vendor/create-new-meal/CreateMealFormContainer";
+function AdminNote({ vendorData }: { vendorData: serializedVendor }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="border border-gray-200 rounded-lg p-4 sm:col-span-2">
@@ -27,7 +26,8 @@ function AdminNote({ vendorData }: { vendorData: Vendor }) {
         <p className="text-sm text-gray-400 italic">No notes added yet.</p>
       )}
       <div
-        className={`w-full flex ${vendorData.adminNote ? "justify-between" : "justify-end"} mt-5 items-center`}>
+        className={`w-full flex ${vendorData.adminNote ? "justify-between" : "justify-end"} mt-5 items-center`}
+      >
         {vendorData.adminNote && (
           <FormContainer action={deleteAdminNote}>
             <input

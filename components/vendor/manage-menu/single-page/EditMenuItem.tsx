@@ -1,6 +1,6 @@
 "use client";
 import FormContainer from "@/components/form/FormContainer";
-import { MenuItem } from "@/generated/prisma/client";
+import { Category, MenuItem } from "@/generated/prisma/client";
 import { editMenuItem } from "@/utils/actions";
 import React, { useState } from "react";
 import { FaRegEdit } from "react-icons/fa";
@@ -12,9 +12,17 @@ import EditImageFieldCreateMenuItem from "./EditImage";
 import { SubmitButton } from "@/components/form/Buttons";
 import { Button } from "@/components/ui/button";
 export type serializedMealItem = Omit<MenuItem, "price"> & { price: number };
-function EditMenuItem({ menuItem }: { menuItem: serializedMealItem }) {
+function EditMenuItem({
+  menuItem,
+  categories,
+}: {
+  menuItem: serializedMealItem;
+  categories: Category[];
+}) {
   const [isImageUploading, setIsImageUploading] = useState(false);
-
+  const categoryName = categories.find(
+    (category) => category.id === menuItem.categoryId,
+  )?.name;
   return (
     <div className="my-5">
       <p className="text-sm text-neutral-600 w-fit flex items-center gap-2 border-b-2 border-neutral-600 mb-3">
@@ -33,8 +41,9 @@ function EditMenuItem({ menuItem }: { menuItem: serializedMealItem }) {
             textAreaInput="border shadow-none"
           />
           <DiscountAndCategory
-            category={menuItem.category}
+            category={categoryName!}
             discount={menuItem.discount}
+            categories={categories}
           />
           <EditAddCarbohydrateAddSidesAddProteinOptionsAndIsAvailable
             isAvailable={menuItem.isAvailable}
@@ -45,6 +54,7 @@ function EditMenuItem({ menuItem }: { menuItem: serializedMealItem }) {
           <EditImageFieldCreateMenuItem
             image={menuItem.image}
             onUploadingChange={setIsImageUploading}
+            key={menuItem.image}
           />
         </div>
         <div className="flex justify-end">

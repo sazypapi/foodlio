@@ -6,9 +6,11 @@ import UserIcon from "./UserIcon";
 function Navbar({ isAdmin }: { isAdmin: boolean }) {
   return (
     <>
-      <Containers className="flex justify-between sm:hidden ">
-        <Logo />
-      </Containers>
+      <nav className="sm:hidden fixed left-0 top-5 right-0 w-full bg-transparent h-20 z-9999">
+        <Containers className="flex justify-between ">
+          <Logo />
+        </Containers>
+      </nav>
       <nav className="hidden sm:block fixed left-0 top-5 right-0 w-full bg-transparent h-20 z-9999">
         <Containers className="max-w-[90%] h-fit mx-auto flex items-center justify-between bg-transparent gap-20">
           <div className="basis-1/6 flex justify-start ">

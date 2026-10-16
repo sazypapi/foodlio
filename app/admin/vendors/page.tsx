@@ -1,5 +1,7 @@
-import VendorApplicationsTable from "@/components/admin/vendors/VendorApplicationsTable";
-import { getAllVendorApplications } from "@/utils/actions";
+import VendorApplicationsTable, {
+  SerializedVendors,
+} from "@/components/admin/vendors/VendorApplicationsTable";
+import { getAllVendors } from "@/utils/actions";
 import { VendorStatus } from "@/generated/prisma/client";
 import AdminLayoutBreadCrumbs from "@/components/admin/BreadCrumbs";
 import {
@@ -14,13 +16,20 @@ import { RxValueNone } from "react-icons/rx";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import Pagination from "@/components/global/Pagination";
 export default async function AdminVendorsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; search?: string }>;
+  searchParams: Promise<{ status?: string; search?: string; page?: string }>;
 }) {
-  const { search, status } = await searchParams;
-  const vendors = await getAllVendorApplications({
+  const { search, status, page } = await searchParams;
+  const currentPage = page ? Number(page) : 1;
+  const {
+    vendors,
+    currentPage: activePage,
+    totalPages,
+  } = await getAllVendors({
+    page: currentPage,
     status: status,
     search: search,
   });
@@ -45,14 +54,18 @@ export default async function AdminVendorsPage({
       </Empty>
     );
   }
-
+  const serializedVendors: SerializedVendors[] = vendors.map((vendor) => ({
+    ...vendor,
+    minimumPrice: vendor.minimumPrice ? vendor.minimumPrice.toNumber() : null,
+  }));
   return (
     <div>
       <AdminLayoutBreadCrumbs primaryLabel="Vendors" />
       <h1 className="text-xl font-semibold text-gray-900 mb-6">
         Vendor applications
       </h1>
-      <VendorApplicationsTable vendors={vendors} />
+      <VendorApplicationsTable vendors={serializedVendors} />
+      <Pagination currentPage={activePage} totalPages={totalPages} />
     </div>
   );
 }

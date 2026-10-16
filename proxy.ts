@@ -2,29 +2,31 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse, NextRequest } from "next/server";
 
 const isProtectedRoute = createRouteMatcher([
-  "/dashboard(.*)",
-  "/userdata(.*)",
-  "/admin(.*)",
-  "/vendor(.*)",
-  "/create-custompiece(.*)",
+  "/dashboard",
+  "/dashboard/(.*)",
+  "/userdata",
+  "/userdata/(.*)",
+  "/admin",
+  "/admin/(.*)",
+  "/vendor",
+  "/vendor/(.*)",
+  "/create-custompiece",
+  "/create-custompiece/(.*)",
 ]);
 
-const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
+const isAdminRoute = createRouteMatcher(["/admin", "/admin/(.*)"]);
 const isVendorRoute = createRouteMatcher(["/vendor", "/vendor/(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
-  // Set pathname header
   console.log("PROXY HIT:", req.nextUrl.pathname);
   const headers = new Headers(req.headers);
   headers.set("x-pathname", req.nextUrl.pathname);
   const response = NextResponse.next({ request: { headers } });
 
-  // Protect all specified routes
   if (isProtectedRoute(req)) {
     await auth.protect();
   }
 
-  // Check role for admin routes
   if (isAdminRoute(req)) {
     const { sessionClaims } = await auth();
     const userRole = (sessionClaims?.metadata as { role?: string })?.role;
@@ -34,6 +36,7 @@ export default clerkMiddleware(async (auth, req) => {
       return NextResponse.redirect(url);
     }
   }
+
   if (isVendorRoute(req)) {
     const { sessionClaims } = await auth();
     const userRole = sessionClaims?.metadata?.role;

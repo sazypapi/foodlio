@@ -11,23 +11,22 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDistanceToNow } from "date-fns";
-import { MenuItem } from "@/generated/prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowUpRightIcon } from "lucide-react";
 import MenuItemsFilter from "./MenuItemsFilter";
-type SerializedMenuItem = Omit<MenuItem, "price"> & { price: number };
+import { formatCurrency } from "@/utils/format";
+type MenuAndCategory = Prisma.MenuItemGetPayload<{
+  include: {
+    category: true;
+  };
+}>;
+type SerializedMenuItem = Omit<MenuAndCategory, "price"> & { price: number };
 
 type Props = {
   menuItems: SerializedMenuItem[];
 };
-function formatPrice(price: number) {
-  return new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-    maximumFractionDigits: 0,
-  }).format(price);
-}
 
 function MenuItemsTable({ menuItems }: Props) {
   return (
@@ -88,35 +87,25 @@ function MenuItemsTable({ menuItems }: Props) {
                       </div>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
-                      {/* <div className="flex flex-wrap gap-1">
-                        {item.category.slice(0, 2).map((c) => (
-                          <span
-                            key={c}
-                            className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
-                          >
-                            {menuCategoryLabels[c as MenuCategory]}
-                          </span>
-                        ))}
-                        {item.category.length > 2 && (
-                          <span className="text-xs text-gray-400">
-                            +{item.category.length - 2}
-                          </span>
-                        )}
-                      </div> */}
+                      <Link href={`/vendor/category/${item.category.slug}`}>
+                        <p className="capitalize underline text-blue-500">
+                          {item.category.name}
+                        </p>
+                      </Link>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
                       {discountedPrice ? (
                         <div>
                           <p className="text-sm font-medium text-gray-900">
-                            {formatPrice(discountedPrice)}
+                            {formatCurrency(discountedPrice)}
                           </p>
                           <p className="text-xs text-gray-400 line-through">
-                            {formatPrice(price)}
+                            {formatCurrency(price)}
                           </p>
                         </div>
                       ) : (
                         <p className="text-sm text-gray-700">
-                          {formatPrice(price)}
+                          {formatCurrency(price)}
                         </p>
                       )}
                     </TableCell>
@@ -168,7 +157,7 @@ function MenuItemsTable({ menuItems }: Props) {
                         className="text-muted-foreground hover:text-black transition duration-300"
                         size="sm"
                       >
-                        <Link href={`/vendor/manage-menu/${item.id}`}>
+                        <Link href={`/vendor/manage-menu/${item.slug}`}>
                           Actions <ArrowUpRightIcon />
                         </Link>
                       </Button>

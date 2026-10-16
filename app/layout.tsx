@@ -36,7 +36,8 @@ export default function RootLayout({
         outfit.variable,
         "font-sans",
         inter.variable,
-      )}>
+      )}
+    >
       <body suppressHydrationWarning className="w-[100%]">
         <ClerkProvider>
           <EdgeStoreProvider>

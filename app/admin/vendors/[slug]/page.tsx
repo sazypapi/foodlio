@@ -14,10 +14,15 @@ import BacktoVendorPage from "@/components/admin/vendors/vendor-details/BacktoVe
 import Header from "@/components/admin/vendors/vendor-details/Header";
 import Body from "@/components/admin/vendors/vendor-details/Body";
 import { RxValueNone } from "react-icons/rx";
+import { serializedVendor } from "@/components/vendor/create-new-meal/CreateMealFormContainer";
 
-async function VendorDetails({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const vendorData = await getSingleVendorRecord(id);
+async function VendorDetails({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const vendorData = await getSingleVendorRecord(slug);
   if (!vendorData) {
     return (
       <Empty>
@@ -41,14 +46,20 @@ async function VendorDetails({ params }: { params: Promise<{ id: string }> }) {
       </Empty>
     );
   }
+  const serializedVendor: serializedVendor = {
+    ...vendorData,
+    minimumPrice: vendorData.minimumPrice
+      ? vendorData.minimumPrice.toNumber()
+      : null,
+  };
   return (
     <div>
-      <BacktoVendorPage vendorData={vendorData} />
+      <BacktoVendorPage vendorData={serializedVendor} />
 
       {/* Header */}
-      <Header vendorData={vendorData} />
+      <Header vendorData={serializedVendor} />
 
-      <Body vendorData={vendorData} />
+      <Body vendorData={serializedVendor} />
     </div>
   );
 }

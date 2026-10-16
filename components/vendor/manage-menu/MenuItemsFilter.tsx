@@ -39,6 +39,7 @@ function SearchInput({ placeholder }: { placeholder: string }) {
     } else {
       params.delete("search");
     }
+    params.delete("page");
     replace(`${pathname}?${params.toString()}`);
   }, 500);
 
@@ -80,6 +81,7 @@ function FilterControls() {
       } else {
         params.set(key, value);
       }
+      params.delete("page");
       router.push(`${pathname}?${params.toString()}`);
     },
     [searchParams, router, pathname],

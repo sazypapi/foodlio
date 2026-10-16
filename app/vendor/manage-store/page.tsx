@@ -12,6 +12,7 @@ async function VendorManageStore() {
     ...vendor,
     minimumPrice: vendor.minimumPrice ? vendor.minimumPrice.toNumber() : null,
   };
+  const reason = canOpenStatus.reason;
   return (
     <div>
       <VendorLayoutBreadCrumbs
@@ -23,7 +24,7 @@ async function VendorManageStore() {
         clerkId={vendor.clerkUserId}
         isRestaurantOn={vendor.closeOpenStatus}
       />
-      {canOpenStatus.reason === "setup" ? (
+      {reason === "setup" ? (
         <AddImagesAndMinimumPrice vendor={serializedVendor} />
       ) : (
         <FullManageStoreForm vendor={serializedVendor} />

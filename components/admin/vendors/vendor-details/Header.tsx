@@ -1,9 +1,10 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Vendor, VendorStatus } from "@/generated/prisma/client";
+import { VendorStatus } from "@/generated/prisma/client";
 import Image from "next/image";
 import StatusActions from "./StatusActions";
+import { serializedVendor } from "@/components/vendor/create-new-meal/CreateMealFormContainer";
 
 const statusStyles: Record<VendorStatus, string> = {
   PENDING: "bg-amber-50 text-amber-700 border-amber-200",
@@ -12,7 +13,7 @@ const statusStyles: Record<VendorStatus, string> = {
   SUSPENDED: "bg-gray-100 text-gray-600 border-gray-200",
 };
 
-function Header({ vendorData }: { vendorData: Vendor }) {
+function Header({ vendorData }: { vendorData: serializedVendor }) {
   return (
     <div className="mt-6 mb-8">
       <div className="flex items-start justify-between gap-4">
@@ -32,7 +33,8 @@ function Header({ vendorData }: { vendorData: Vendor }) {
               </h1>
               <Badge
                 variant="outline"
-                className={`text-xs capitalize ${statusStyles[vendorData.status]}`}>
+                className={`text-xs capitalize ${statusStyles[vendorData.status]}`}
+              >
                 {vendorData.status.toLowerCase()}
               </Badge>
             </div>

@@ -1,6 +1,6 @@
 "use client";
-import { Order, OrderItem } from "@/generated/prisma/client";
-import React, { useState } from "react";
+import { OrderItem } from "@/generated/prisma/client";
+import { useState } from "react";
 import {
   Empty,
   EmptyContent,
@@ -11,8 +11,7 @@ import {
 } from "@/components/ui/empty";
 import { RxValueNone } from "react-icons/rx";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { FiArrowUpRight } from "react-icons/fi";
+
 import FiltersForSalesOverview from "./FiltersForSalesOverview";
 import RevenueChart from "../../dashboard/RevenueChart";
 type SerializedMealOrders = Omit<OrderItem, "unitPrice"> & {
@@ -112,7 +111,7 @@ function SalesComponent({
         : groupByMonth(filteredOrders);
   return (
     <div className="mt-5">
-      <section className="flex justify-between items-center">
+      <section className="flex justify-start items-center">
         <FiltersForSalesOverview
           customEnd={customEnd}
           customStart={customStart}
@@ -121,12 +120,6 @@ function SalesComponent({
           setCustomStart={setCustomStart}
           setRange={setRange}
         />
-        <Link
-          href="/vendor/sales"
-          className="flex text-nowrap items-baseline text-xs text-neutral-500 transition duration-300 hover:text-black sm:text-sm underline"
-        >
-          Sales Analytics <FiArrowUpRight />
-        </Link>
       </section>
       {filteredOrders.length === 0 ? (
         <Empty>

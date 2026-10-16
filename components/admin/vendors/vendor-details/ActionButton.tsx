@@ -26,7 +26,8 @@ function ActionButton({
       <button
         type="submit"
         disabled={isPending}
-        className={`text-sm px-3 py-1.5 rounded-sm transition-colors duration-200 disabled:opacity-50 ${className}`}>
+        className={`text-sm px-3 py-1.5 rounded-sm transition-colors duration-200 disabled:opacity-50 ${className}`}
+      >
         {isPending ? "Please wait..." : label}
       </button>
     </form>

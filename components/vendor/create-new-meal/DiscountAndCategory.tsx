@@ -7,14 +7,8 @@ import CreatableSelect from "./CategorySelect";
 import { Category } from "@/generated/prisma/client";
 
 function DiscountAndCategory({ category }: { category: Category[] }) {
-  const [categories, setCategories] = useState([]);
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {categories.map((c) => (
-        <input key={c} type="hidden" name="category" value={c} />
-      ))}
-
       <div>
         <Label
           className="capitalize mb-1 sm:mb-2 text-xs sm:text-sm"

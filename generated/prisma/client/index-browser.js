@@ -120,6 +120,22 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  clerkUserId: 'clerkUserId',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  username: 'username',
+  email: 'email',
+  phoneNumber: 'phoneNumber',
+  address: 'address',
+  state: 'state',
+  localGovernmentArea: 'localGovernmentArea',
+  avatar: 'avatar',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.VendorScalarFieldEnum = {
   id: 'id',
   clerkUserId: 'clerkUserId',
@@ -128,6 +144,9 @@ exports.Prisma.VendorScalarFieldEnum = {
   description: 'description',
   logo: 'logo',
   address: 'address',
+  landmark: 'landmark',
+  latitude: 'latitude',
+  longitude: 'longitude',
   state: 'state',
   localGovernmentArea: 'localGovernmentArea',
   phoneNumber: 'phoneNumber',
@@ -174,9 +193,11 @@ exports.Prisma.CarbOptionScalarFieldEnum = {
   id: 'id',
   name: 'name',
   slug: 'slug',
+  image: 'image',
   extraPrice: 'extraPrice',
   isAvailable: 'isAvailable',
-  vendorId: 'vendorId'
+  vendorId: 'vendorId',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.PackTypeScalarFieldEnum = {
@@ -191,7 +212,10 @@ exports.Prisma.PackTypeScalarFieldEnum = {
 exports.Prisma.OrderItemCarbScalarFieldEnum = {
   id: 'id',
   orderItemId: 'orderItemId',
-  carbOptionId: 'carbOptionId'
+  carbOptionId: 'carbOptionId',
+  createdAt: 'createdAt',
+  unitPrice: 'unitPrice',
+  quantity: 'quantity'
 };
 
 exports.Prisma.SideOptionScalarFieldEnum = {
@@ -200,13 +224,18 @@ exports.Prisma.SideOptionScalarFieldEnum = {
   slug: 'slug',
   extraPrice: 'extraPrice',
   isAvailable: 'isAvailable',
-  vendorId: 'vendorId'
+  vendorId: 'vendorId',
+  image: 'image',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.OrderItemSideScalarFieldEnum = {
   id: 'id',
   orderItemId: 'orderItemId',
-  sideOptionId: 'sideOptionId'
+  sideOptionId: 'sideOptionId',
+  unitPrice: 'unitPrice',
+  quantity: 'quantity',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.ProteinOptionScalarFieldEnum = {
@@ -215,11 +244,23 @@ exports.Prisma.ProteinOptionScalarFieldEnum = {
   slug: 'slug',
   extraPrice: 'extraPrice',
   isAvailable: 'isAvailable',
-  vendorId: 'vendorId'
+  vendorId: 'vendorId',
+  image: 'image',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.OrderItemProteinScalarFieldEnum = {
+  id: 'id',
+  orderItemId: 'orderItemId',
+  proteinOptionId: 'proteinOptionId',
+  unitPrice: 'unitPrice',
+  quantity: 'quantity',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.RiderScalarFieldEnum = {
   id: 'id',
+  name: 'name',
   clerkUserId: 'clerkUserId',
   phone: 'phone',
   vehicleType: 'vehicleType',
@@ -231,7 +272,7 @@ exports.Prisma.RiderScalarFieldEnum = {
 
 exports.Prisma.OrderScalarFieldEnum = {
   id: 'id',
-  clerkUserId: 'clerkUserId',
+  userId: 'userId',
   vendorId: 'vendorId',
   riderId: 'riderId',
   status: 'status',
@@ -248,7 +289,6 @@ exports.Prisma.OrderItemScalarFieldEnum = {
   menuItemId: 'menuItemId',
   quantity: 'quantity',
   unitPrice: 'unitPrice',
-  proteinOptionId: 'proteinOptionId',
   createdAt: 'createdAt'
 };
 
@@ -297,6 +337,7 @@ exports.OrderStatus = exports.$Enums.OrderStatus = {
 };
 
 exports.Prisma.ModelName = {
+  User: 'User',
   Vendor: 'Vendor',
   Category: 'Category',
   MenuItem: 'MenuItem',
@@ -306,6 +347,7 @@ exports.Prisma.ModelName = {
   SideOption: 'SideOption',
   OrderItemSide: 'OrderItemSide',
   ProteinOption: 'ProteinOption',
+  OrderItemProtein: 'OrderItemProtein',
   Rider: 'Rider',
   Order: 'Order',
   OrderItem: 'OrderItem'

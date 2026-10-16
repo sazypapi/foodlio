@@ -38,7 +38,8 @@ function UserIcon({ isAdmin }: { isAdmin: boolean }) {
       <div
         className="relative"
         onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}>
+        onMouseLeave={() => setOpen(false)}
+      >
         {profileImage ? (
           <Image
             src={profileImage}
@@ -60,21 +61,24 @@ function UserIcon({ isAdmin }: { isAdmin: boolean }) {
               <Link href="/dashboard/account">
                 <div
                   className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
-                  onClick={() => setOpen(false)}>
+                  onClick={() => setOpen(false)}
+                >
                   My Account
                 </div>
               </Link>
               <Link href="/dashboard/orders">
                 <div
                   className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
-                  onClick={() => setOpen(false)}>
+                  onClick={() => setOpen(false)}
+                >
                   Orders
                 </div>
               </Link>
               <Link href="/dashboard/wishlist">
                 <div
                   className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
-                  onClick={() => setOpen(false)}>
+                  onClick={() => setOpen(false)}
+                >
                   Wishlist
                 </div>
               </Link>
@@ -82,14 +86,16 @@ function UserIcon({ isAdmin }: { isAdmin: boolean }) {
                 <Link href="/admin/dashboard">
                   <div
                     className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
-                    onClick={() => setOpen(false)}>
+                    onClick={() => setOpen(false)}
+                  >
                     Admin Dashboard
                   </div>
                 </Link>
               )}
               <div
                 className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
-                onClick={toastLogout}>
+                onClick={toastLogout}
+              >
                 <SignOutButton>Logout</SignOutButton>
               </div>
             </div>
@@ -103,7 +109,8 @@ function UserIcon({ isAdmin }: { isAdmin: boolean }) {
     <div
       className="relative"
       onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}>
+      onMouseLeave={() => setOpen(false)}
+    >
       <div className="flex align-middle items-center cursor-pointer">
         <LuUser className="h-8 w-8 bg-primary text-gray-300 rounded-full" />
       </div>
@@ -113,16 +120,22 @@ function UserIcon({ isAdmin }: { isAdmin: boolean }) {
           <div className="absolute top-full right-0 w-full h-2" />
           <div className="absolute top-[calc(100%+4px)] right-0 w-40 bg-white border border-gray-200 rounded-md py-1 z-50 text-black">
             <Show when="signed-out">
-              <div
-                className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
-                onClick={() => setOpen(false)}>
-                <SignInButton mode="modal">Login</SignInButton>
-              </div>
-              <div
-                className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
-                onClick={() => setOpen(false)}>
-                <SignUpButton mode="modal">Register</SignUpButton>
-              </div>
+              <SignInButton mode="modal">
+                <div
+                  className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
+                  onClick={() => setOpen(false)}
+                >
+                  Login
+                </div>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <div
+                  className="px-4 py-2 text-xs hover:bg-gray-50 cursor-pointer transition duration-150"
+                  onClick={() => setOpen(false)}
+                >
+                  Register
+                </div>
+              </SignUpButton>
             </Show>
           </div>
         </>

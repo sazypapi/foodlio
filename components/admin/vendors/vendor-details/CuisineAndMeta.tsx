@@ -1,9 +1,9 @@
-import { Vendor } from "@/generated/prisma/client";
+import { serializedVendor } from "@/components/vendor/create-new-meal/CreateMealFormContainer";
 import { formatDistanceToNow } from "date-fns";
 import { CalendarDays } from "lucide-react";
 import React from "react";
 
-function CuisineAndMeta({ vendorData }: { vendorData: Vendor }) {
+function CuisineAndMeta({ vendorData }: { vendorData: serializedVendor }) {
   return (
     <div className="border border-gray-200 rounded-lg p-4">
       <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">
@@ -16,7 +16,8 @@ function CuisineAndMeta({ vendorData }: { vendorData: Vendor }) {
             {vendorData.cuisineType.map((c) => (
               <span
                 key={c}
-                className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
+                className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full"
+              >
                 {c}
               </span>
             ))}

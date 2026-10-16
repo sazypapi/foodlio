@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Vendor } from "@/generated/prisma/client";
+import { serializedVendor } from "@/components/vendor/create-new-meal/CreateMealFormContainer";
 import { ArrowUpRightIcon } from "lucide-react";
 import Link from "next/link";
 import { FaArrowLeft } from "react-icons/fa";
 
-function BacktoVendorPage({ vendorData }: { vendorData: Vendor }) {
+function BacktoVendorPage({ vendorData }: { vendorData: serializedVendor }) {
   return (
     <div className="flex justify-between items-center mb-5 gap-2">
       <div className="flex justify-between items-center gap-2">
@@ -19,7 +19,8 @@ function BacktoVendorPage({ vendorData }: { vendorData: Vendor }) {
         variant="link"
         asChild
         className="text-muted-foreground hover:text-black transition dura"
-        size="lg">
+        size="lg"
+      >
         <Link href={`/admin/vendors/analytics/${vendorData.id}`}>
           View Analytics <ArrowUpRightIcon />
         </Link>

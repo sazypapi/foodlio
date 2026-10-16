@@ -3,7 +3,19 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+/* global.css */
+body[data-scroll-locked] {
+  margin-right: 0px !important; /* For LTR layout */
+  margin-left: 0px !important; /* For RTL layout */
+  overflow: visible !important;
+}
 
+/*OR Use more specific selectors:*/
+html body[data-scroll-locked] {
+  margin-right: 0px !important; /* For LTR layout */
+  margin-left: 0px !important; /* For RTL layout */
+  overflow: visible !important;
+}
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

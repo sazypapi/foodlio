@@ -61,7 +61,7 @@ export default function EditImageFieldCreateMenuItem({
               alt="Uploaded"
               width={128}
               height={128}
-              className="object-cover rounded-lg"
+              className="object-cover rounded-lg w-32 h-32"
             />
           </>
         ) : (
@@ -74,7 +74,7 @@ export default function EditImageFieldCreateMenuItem({
               alt="Uploaded"
               width={128}
               height={128}
-              className="object-cover rounded-lg"
+              className="object-cover rounded-lg w-32 h-32"
             />
           </>
         )}
@@ -111,7 +111,7 @@ export default function EditImageFieldCreateMenuItem({
                 alt="Preview"
                 width={128}
                 height={128}
-                className="object-cover rounded-lg mt-2"
+                className="object-cover rounded-lg mt-2 w-32 h-32"
               />
             )}
           </>

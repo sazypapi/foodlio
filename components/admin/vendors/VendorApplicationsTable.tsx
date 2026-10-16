@@ -25,7 +25,10 @@ const statusStyles: Record<VendorStatus, string> = {
 };
 
 type Props = {
-  vendors: Vendor[];
+  vendors: SerializedVendors[];
+};
+export type SerializedVendors = Omit<Vendor, "minimumPrice"> & {
+  minimumPrice: number | null;
 };
 
 function VendorApplicationsTable({ vendors }: Props) {
@@ -124,7 +127,7 @@ function VendorApplicationsTable({ vendors }: Props) {
                       className="text-muted-foreground hover:text-black transition dura"
                       size="sm"
                     >
-                      <Link href={`/admin/vendors/${vendor.id}`}>
+                      <Link href={`/admin/vendors/${vendor.slug}`}>
                         Actions <ArrowUpRightIcon />
                       </Link>
                     </Button>

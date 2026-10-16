@@ -37,14 +37,34 @@ enum VehicleType {
   CAR
 }
 
+model User {
+  id                  String   @id @default(cuid())
+  clerkUserId         String   @unique
+  firstName           String
+  lastName            String
+  username            String   @unique
+  email               String   @unique
+  phoneNumber         String?
+  address             String?
+  state               String?
+  localGovernmentArea String?
+  avatar              String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  orders              Order[]
+}
+
 model Vendor {
   id                  String          @id @default(cuid())
   clerkUserId         String          @unique
   name                String
-  slug String
+  slug                String          @unique
   description         String
   logo                String
   address             String
+  landmark            String?
+  latitude            Float?
+  longitude           Float?
   state               String
   localGovernmentArea String
   phoneNumber         String
@@ -70,7 +90,7 @@ model Vendor {
 model Category {
   id        String     @id @default(cuid())
   name      String
-  slug String
+  slug      String
   vendorId  String
   vendor    Vendor     @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   menuItems MenuItem[]
@@ -85,7 +105,7 @@ model MenuItem {
   categoryId             String
   category               Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   name                   String
-  slug String
+  slug                   String
   description            String
   price                  Decimal
   image                  String
@@ -98,26 +118,28 @@ model MenuItem {
   orderItems             OrderItem[]
   createdAt              DateTime    @default(now())
   updatedAt              DateTime    @updatedAt
+  @@unique([vendorId, slug])
 }
 
 model CarbOption {
   id             String          @id @default(cuid())
-  name           String 
-  slug String
-
-  extraPrice     Int             @default(0)
+  name           String
+  slug           String
+  image          String
+  extraPrice     Decimal         @default(0)
   isAvailable    Boolean         @default(true)
   vendorId       String
+  createdAt      DateTime        @default(now())
   vendor         Vendor          @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   orderItemCarbs OrderItemCarb[]
+  @@unique([vendorId, slug])
 }
 
-// Pack type is chosen once per order, not per menu item — scoped to the vendor
 model PackType {
   id          String   @id @default(cuid())
-  name        String 
-  slug String
-  extraPrice  Int      @default(0)
+  name        String
+  slug        String
+  extraPrice  Decimal  @default(0)
   isAvailable Boolean  @default(true)
   vendorId    String
   vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
@@ -130,19 +152,24 @@ model OrderItemCarb {
   orderItemId  String
   carbOption   CarbOption @relation(fields: [carbOptionId], references: [id])
   carbOptionId String
-
+  createdAt    DateTime   @default(now())
+  unitPrice    Decimal
+  quantity     Int        @default(1)
   @@unique([orderItemId, carbOptionId])
 }
 
 model SideOption {
   id             String          @id @default(cuid())
-  name           String 
-  slug String
-  extraPrice     Int             @default(0)
+  name           String
+  slug           String
+  extraPrice     Decimal         @default(0)
   isAvailable    Boolean         @default(true)
   vendorId       String
+  image          String
+  createdAt      DateTime        @default(now())
   vendor         Vendor          @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   orderItemSides OrderItemSide[]
+  @@unique([vendorId, slug])
 }
 
 model OrderItemSide {
@@ -151,23 +178,41 @@ model OrderItemSide {
   orderItemId  String
   sideOption   SideOption @relation(fields: [sideOptionId], references: [id])
   sideOptionId String
-
-  @@unique([orderItemId, sideOptionId]) // prevent duplicate selection of same side
+  unitPrice    Decimal
+  quantity     Int        @default(1)
+  createdAt    DateTime   @default(now())
+  @@unique([orderItemId, sideOptionId])
 }
 
 model ProteinOption {
-  id          String      @id @default(cuid())
-  name        String
-  slug String
-  extraPrice  Int         @default(0)
-  isAvailable Boolean     @default(true)
-  vendorId    String
-  vendor      Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-  orderItems  OrderItem[]
+  id                String             @id @default(cuid())
+  name              String
+  slug              String
+  extraPrice        Decimal              @default(0)
+  isAvailable       Boolean            @default(true)
+  vendorId          String
+  image             String
+  createdAt         DateTime           @default(now())
+  vendor            Vendor             @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  orderItemProteins OrderItemProtein[]
+  @@unique([vendorId, slug])
+}
+
+model OrderItemProtein {
+  id              String        @id @default(cuid())
+  orderItem       OrderItem     @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  orderItemId     String
+  proteinOption   ProteinOption @relation(fields: [proteinOptionId], references: [id])
+  proteinOptionId String
+  unitPrice       Decimal
+  quantity        Int           @default(1)
+  createdAt       DateTime      @default(now())
+  @@unique([orderItemId, proteinOptionId])
 }
 
 model Rider {
   id          String      @id @default(cuid())
+  name        String
   clerkUserId String      @unique
   phone       String
   vehicleType VehicleType
@@ -180,7 +225,8 @@ model Rider {
 
 model Order {
   id              String      @id @default(cuid())
-  clerkUserId     String
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
   vendorId        String
   vendor          Vendor      @relation(fields: [vendorId], references: [id])
   riderId         String?
@@ -196,16 +242,15 @@ model Order {
 }
 
 model OrderItem {
-  id              String          @id @default(cuid())
-  orderId         String
-  order           Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  menuItemId      String
-  menuItem        MenuItem        @relation(fields: [menuItemId], references: [id])
-  quantity        Int
-  unitPrice       Decimal
-  proteinOptionId String?
-  proteinOption   ProteinOption?  @relation(fields: [proteinOptionId], references: [id])
-  createdAt       DateTime        @default(now())
-  orderItemSides  OrderItemSide[]
-  orderItemCarbs  OrderItemCarb[]
+  id                String             @id @default(cuid())
+  orderId           String
+  order             Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId        String
+  menuItem          MenuItem           @relation(fields: [menuItemId], references: [id])
+  quantity          Int
+  unitPrice         Decimal
+  createdAt         DateTime           @default(now())
+  orderItemSides    OrderItemSide[]
+  orderItemCarbs    OrderItemCarb[]
+  orderItemProteins OrderItemProtein[]
 }

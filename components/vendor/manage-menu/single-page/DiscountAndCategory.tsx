@@ -2,24 +2,20 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
-import MenuCategorySelect from "../../create-new-meal/CategorySelect";
-import { MenuCategory } from "@/generated/prisma/client";
+import CreatableSelect from "../../create-new-meal/CategorySelect";
+import { Category } from "@/generated/prisma/client";
 
 function DiscountAndCategory({
   discount,
   category,
+  categories,
 }: {
   discount: number | null;
-  category: MenuCategory[];
+  category: string;
+  categories: Category[];
 }) {
-  const [categories, setCategories] = useState<MenuCategory[]>(category);
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {categories.map((c) => (
-        <input key={c} type="hidden" name="category" value={c} />
-      ))}
-
       <div>
         <Label
           className="capitalize mb-1 sm:mb-2 text-xs sm:text-sm"
@@ -39,7 +35,7 @@ function DiscountAndCategory({
           min="0"
         />
       </div>
-      <MenuCategorySelect value={categories} onChange={setCategories} />
+      <CreatableSelect category={categories} selectedCategory={category} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import VendorLayoutBreadCrumbs from "@/components/vendor/BreadCrumbs";
 import { CreateMenuItemButton } from "@/components/vendor/manage-store/CreateMenuItemButton";
-import { getAllMenuItems, getVendorByClerkId } from "@/utils/actions";
+import { getAllMenuItems } from "@/utils/actions";
 import {
   Empty,
   EmptyContent,
@@ -13,20 +13,31 @@ import { RxValueNone } from "react-icons/rx";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import MenuItemsTable from "@/components/vendor/manage-menu/ViewAllMenuItems";
+import Pagination from "@/components/global/Pagination";
 async function ManageMenu({
   searchParams,
 }: {
-  searchParams: Promise<{ availability?: string; search?: string }>;
+  searchParams: Promise<{
+    availability?: string;
+    search?: string;
+    page?: string;
+  }>;
 }) {
-  const { search, availability } = await searchParams;
-  const vendor = await getVendorByClerkId();
-  const allMenuItems = await getAllMenuItems(vendor.id, {
+  const { search, availability, page } = await searchParams;
+  const currentPage = page ? Number(page) : 1;
+  const {
+    menuItems,
+    totalPages,
+    currentPage: activePage,
+    vendor,
+  } = await getAllMenuItems({
     search: search,
     availability: availability,
+    page: currentPage,
   });
   const hasActiveFilters = Boolean(search) || Boolean(availability);
 
-  if (allMenuItems.length === 0 && !hasActiveFilters) {
+  if (menuItems.length === 0 && !hasActiveFilters) {
     return (
       <Empty>
         <EmptyHeader>
@@ -46,21 +57,19 @@ async function ManageMenu({
       </Empty>
     );
   }
-  const serializedMenuItems = allMenuItems.map((item) => ({
+  const serializedMenuItems = menuItems.map((item) => ({
     ...item,
     price: item.price.toNumber(),
   }));
   return (
     <div>
-      <VendorLayoutBreadCrumbs
-        vendorName={vendor.name}
-        primaryLabel="Dashoard"
-      />
+      <VendorLayoutBreadCrumbs vendorName={vendor.name} primaryLabel="Menu" />
       <CreateMenuItemButton />
       <h1 className="text-xl font-semibold text-gray-900 mb-6">
         Manage Your Menu
       </h1>
       <MenuItemsTable menuItems={serializedMenuItems} />
+      <Pagination currentPage={activePage} totalPages={totalPages} />
     </div>
   );
 }

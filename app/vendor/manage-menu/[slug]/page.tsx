@@ -1,4 +1,4 @@
-import { getSingleMenuItem } from "@/utils/actions";
+import { getSingleMenuItem, getVendorsCategory } from "@/utils/actions";
 import {
   Empty,
   EmptyContent,
@@ -21,10 +21,11 @@ import BacktoManageMenu from "@/components/vendor/manage-menu/single-page/BackTo
 async function MenuItemSinglePage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { id } = await params;
-  const menuItem = await getSingleMenuItem(id);
+  const { slug } = await params;
+  const menuItem = await getSingleMenuItem(slug);
+  const vendorCategory = await getVendorsCategory();
   if (!menuItem) {
     return (
       <Empty>
@@ -60,7 +61,7 @@ async function MenuItemSinglePage({
   return (
     <div>
       <BacktoManageMenu />
-      <EditMenuItem menuItem={serializedMealItem} />
+      <EditMenuItem menuItem={serializedMealItem} categories={vendorCategory} />
       <Metrics menuItem={serializedMenuItemWithOrderItems} />
       <SalesOverview mealOrders={serializedMenuItemWithOrderItems.orderItems} />
     </div>

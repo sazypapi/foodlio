@@ -8,12 +8,18 @@ import {
   Bike,
   BarChart2,
   LogOut,
+  ChevronDown,
 } from "lucide-react";
 import { useClerk } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { BiFoodMenu } from "react-icons/bi";
 import { FaRegSquarePlus } from "react-icons/fa6";
 import { FaRegLightbulb } from "react-icons/fa";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const links = [
   { label: "Dashboard", href: "/vendor/dashboard", icon: LayoutDashboard },
@@ -22,8 +28,17 @@ const links = [
     href: "/vendor/manage-store",
     icon: Store,
   },
-  { label: "Manage Menu", href: "/vendor/manage-menu", icon: BiFoodMenu },
-
+  {
+    label: "Manage Menu",
+    href: "/vendor/manage-menu",
+    icon: BiFoodMenu,
+    children: [
+      { label: "Main Dishes", href: "/vendor/manage-menu" },
+      { label: "Sides", href: "/vendor/manage-menu/sides" },
+      { label: "Carb Options", href: "/vendor/manage-menu/carb-options" },
+      { label: "Protein Options", href: "/vendor/manage-menu/protein-options" },
+    ],
+  },
   { label: "Orders", href: "/vendor/orders", icon: ShoppingBag },
   { label: "Riders", href: "/vendor/riders", icon: Bike },
   { label: "Metrics", href: "/vendor/metrics", icon: BarChart2 },
@@ -92,7 +107,67 @@ function Sidebar({
             isRoot && "px-6 py-0",
           )}
         >
-          {links.map(({ label, href, icon: Icon }) => {
+          {links.map((link) => {
+            const {
+              label,
+              href,
+              icon: Icon,
+              children,
+            } = link as typeof link & {
+              children?: { label: string; href: string }[];
+            };
+
+            // Parent item with nested children -> Collapsible, NOT a link
+            if (children && children.length > 0) {
+              const isChildActive = children.some((c) =>
+                pathname.startsWith(c.href),
+              );
+              return (
+                <Collapsible
+                  key={label}
+                  defaultOpen={isChildActive}
+                  className="flex flex-col"
+                >
+                  <CollapsibleTrigger
+                    className={cn(
+                      "flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-150 group w-full",
+                      isChildActive
+                        ? "bg-blue-900 text-white"
+                        : "text-gray-600 hover:bg-zinc-100 hover:text-blue-800",
+                    )}
+                  >
+                    <span className="flex items-center gap-3">
+                      <Icon className="w-4 h-4" />
+                      {label}
+                    </span>
+                    <ChevronDown className="w-4 h-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                  </CollapsibleTrigger>
+
+                  <CollapsibleContent className="flex flex-col gap-1 pl-11 pt-1 pb-1">
+                    {children.map((child) => {
+                      const isChildLinkActive = pathname === child.href;
+                      return (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          onClick={onNavigate}
+                          className={cn(
+                            "px-3 py-2 rounded-md text-sm transition-all duration-150",
+                            isChildLinkActive
+                              ? "text-blue-900 font-medium"
+                              : "text-gray-500 hover:text-blue-900",
+                          )}
+                        >
+                          {child.label}
+                        </Link>
+                      );
+                    })}
+                  </CollapsibleContent>
+                </Collapsible>
+              );
+            }
+
+            // Plain link, no children
             const isActive = pathname.startsWith(href);
             return (
               <Link
@@ -102,8 +177,8 @@ function Sidebar({
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-150",
                   isActive
-                    ? "bg-black text-white"
-                    : "text-gray-600 hover:bg-zinc-100 hover:text-black",
+                    ? "bg-blue-900 text-white"
+                    : "text-gray-600 hover:bg-zinc-100 hover:text-blue-800",
                 )}
               >
                 <Icon className="w-4 h-4" />
