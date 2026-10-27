@@ -2,7 +2,6 @@ import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/navbar/Navbar";
 import { cn } from "@/lib/utils";
 import NavbarWrapper from "@/components/navbar/NavbarWrapper";
 import { Suspense } from "react";

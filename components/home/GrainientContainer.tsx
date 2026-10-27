@@ -4,6 +4,7 @@ import Containers from "../global/Containers";
 import TextType from "../ui/TextType";
 import Image from "next/image";
 import HomeSearchComponent from "./DeliveryAddressInput";
+import StackScroll from "./StackScroll";
 
 function GrainientContainer() {
   return (
@@ -73,6 +74,7 @@ function GrainientContainer() {
               className="sm:hidden mt-3"
             />
           </Containers>
+          <StackScroll />
         </div>
       </div>
     </>

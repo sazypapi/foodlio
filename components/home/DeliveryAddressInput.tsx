@@ -22,6 +22,22 @@ type Props = {
 // NAME OF THE ENV VARIABLE HOLDING YOUR MAPBOX PUBLIC TOKEN (CHANGE IF YOURS IS DIFFERENT)
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
+// SAVES THE CONFIRMED ADDRESS AS A COOKIE SO THE /STORE SERVER COMPONENT CAN READ IT.
+// ONLY LABEL, LAT AND LNG ARE SAVED. THE ID IS NOT NEEDED THERE.
+function saveLocationCookie(address: DeliveryAddress) {
+  // ENCODEURICOMPONENT STOPS COMMAS AND QUOTES IN THE JSON FROM BREAKING THE COOKIE
+  const value = encodeURIComponent(
+    JSON.stringify({
+      label: address.label,
+      lat: address.lat,
+      lng: address.lng,
+    }),
+  );
+  const thirtyDays = 60 * 60 * 24 * 30;
+  // PATH=/ MAKES THE COOKIE AVAILABLE ON EVERY PAGE, NOT JUST THE ONE THAT SET IT
+  document.cookie = `location=${value}; path=/; max-age=${thirtyDays}; samesite=lax`;
+}
+
 // BUILDS A READABLE LABEL FROM A MAPBOX V6 FEATURE, WITH FALLBACKS FOR RESULTS THAT HAVE NO FULL ADDRESS
 function getLabel(feature: any): string {
   const p = feature.properties ?? {};
@@ -33,11 +49,12 @@ function getLabel(feature: any): string {
 }
 
 // SEARCH: TURNS TYPED TEXT INTO A LIST OF SUGGESTIONS USING MAPBOX
+// PROXIMITY=IP TELLS MAPBOX TO FAVOUR RESULTS CLOSE TO WHERE THE USER IS CONNECTING FROM
 async function fetchSuggestions(query: string): Promise<DeliveryAddress[]> {
   const res = await fetch(
     `https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(
       query,
-    )}&country=ng&limit=5&autocomplete=true&language=en&access_token=${MAPBOX_TOKEN}`,
+    )}&country=ng&limit=5&autocomplete=true&proximity=ip&language=en&access_token=${MAPBOX_TOKEN}`,
   );
 
   if (!res.ok) throw new Error("MAPBOX SEARCH FAILED");
@@ -161,10 +178,14 @@ export default function DeliveryAddressInput({ onSelect }: Props) {
 
   // THE ADDRESS THE USER HAS PICKED BUT NOT YET CONFIRMED ON THE MAP. NULL MEANS NO CONFIRM PANEL.
   const [pending, setPending] = useState<DeliveryAddress | null>(null);
-  // THE ADDRESS THE USER HAS CONFIRMED. THIS IS WHAT THE ORDER NOW LINK SENDS TO /STORE.
+  // THE ADDRESS THE USER HAS CONFIRMED. THE ORDER NOW LINK IS ONLY ENABLED WHEN THIS IS SET.
   const [confirmed, setConfirmed] = useState<DeliveryAddress | null>(null);
   // TRUE WHILE WE ARE LOOKING UP THE TEXT FOR WHEREVER THE PIN WAS JUST MOVED
   const [resolving, setResolving] = useState(false);
+
+  // TRUE ONLY AFTER "PIN IT ON THE MAP": THE PIN STARTS AT MAPBOX'S WRONG GUESS, SO THE USER
+  // MUST MOVE IT BEFORE CONFIRMING. STATE (NOT A REF) BECAUSE THE BUTTON AND HINT MUST RE-RENDER.
+  const [needsPinMove, setNeedsPinMove] = useState(false);
 
   // REF, NOT STATE: A SILENT FLAG THAT SHOULD NOT CAUSE A RE-RENDER
   const skipNextSearch = useRef(false);
@@ -242,14 +263,42 @@ export default function DeliveryAddressInput({ onSelect }: Props) {
     setError("");
     moveCounter.current += 1;
     setResolving(false);
+    // A NORMAL PICK STARTS THE PIN AT A SPOT THE USER ACCEPTED, SO NO MOVE IS REQUIRED
+    setNeedsPinMove(false);
     setPending(address);
     // A NEW PICK MEANS ANY PREVIOUSLY CONFIRMED ADDRESS IS OUT OF DATE
+    setConfirmed(null);
+  }
+
+  // THE USER SAYS NONE OF THE SUGGESTIONS ARE RIGHT. OPEN THE CONFIRM MAP STARTING AT THE TOP
+  // SUGGESTION (THE NEAREST THING MAPBOX KNOWS) SO THE USER CAN DRAG THE PIN TO THEIR REAL SPOT.
+  // THE INPUT TEXT IS NOT TOUCHED HERE, SO THE SKIP FLAG IS NOT NEEDED.
+  function handlePinManually() {
+    const guess = suggestions[0];
+    if (!guess) return;
+
+    moveCounter.current += 1;
+    setResolving(false);
+    setError("");
+    setOpen(false);
+    // THE STARTING SPOT IS A GUESS THE USER JUST REJECTED, SO CONFIRM STAYS LOCKED UNTIL THEY MOVE THE PIN
+    setNeedsPinMove(true);
+    // THE LABEL IS WHAT THE USER TYPED UNTIL THEY MOVE THE PIN AND REVERSE GEOCODING REPLACES IT
+    setPending({
+      id: `manual-${guess.id}`,
+      label: query,
+      lat: guess.lat,
+      lng: guess.lng,
+    });
     setConfirmed(null);
   }
 
   // RUNS WHEN THE PIN IS DRAGGED OR THE MAP IS TAPPED
   async function handlePinMove(lat: number, lng: number) {
     const thisMove = ++moveCounter.current;
+
+    // THE USER HAS NOW PLACED THE PIN THEMSELVES, SO CONFIRMING IS ALLOWED
+    setNeedsPinMove(false);
 
     // THE PIN'S COORDINATES ARE THE TRUTH, SO SAVE THEM RIGHT AWAY
     setPending((p) => (p ? { ...p, lat, lng } : p));
@@ -275,7 +324,7 @@ export default function DeliveryAddressInput({ onSelect }: Props) {
     }
   }
 
-  // WHEN THE USER CONFIRMS THE PIN: TELL THE PARENT AND REMEMBER IT FOR THE ORDER NOW LINK
+  // WHEN THE USER CONFIRMS THE PIN: SAVE THE COOKIE, TELL THE PARENT, AND REMEMBER IT FOR THE ORDER NOW LINK
   function handleConfirm() {
     if (!pending) return;
 
@@ -284,6 +333,9 @@ export default function DeliveryAddressInput({ onSelect }: Props) {
       skipNextSearch.current = true;
       setQuery(pending.label);
     }
+
+    // THE COOKIE IS WRITTEN HERE SO /STORE CAN READ IT ON THE NEXT REQUEST
+    saveLocationCookie(pending);
 
     onSelect?.(pending);
     setConfirmed(pending);
@@ -335,19 +387,10 @@ export default function DeliveryAddressInput({ onSelect }: Props) {
     );
   }
 
-  // LINK TARGET: THE CONFIRMED ADDRESS TRAVELS AS QUERY PARAMS. URLSearchParams HANDLES THE ENCODING.
-  const storeHref = confirmed
-    ? `/store?${new URLSearchParams({
-        label: confirmed.label,
-        lat: String(confirmed.lat),
-        lng: String(confirmed.lng),
-      })}`
-    : "/store";
-
   return (
     <div ref={wrapperRef} className="relative w-full max-w-xl">
       {/* MOBILE: STACKED. SM AND UP: SINGLE ROW. PILL IS ALWAYS ROUNDED-FULL, NO RADIUS CHANGE ON HOVER OR ACTIVE */}
-      <div className="flex gap-2 p-2 flex-row sm:items-center rounded-full border-2 border-dashed border-black hover:bg-white bg-white font-semibold text-black transition-all duration-300 hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[4px_4px_0px_black] active:translate-x-[0px] active:translate-y-[0px] active:shadow-none capitalize focus-within:translate-x-[-4px] focus-within:translate-y-[-4px] focus-within:shadow-[4px_4px_0px_black]">
+      <div className="flex gap-2 p-2 flex-row sm:items-center rounded-full border-2 border-dashed border-black hover:bg-white bg-white font-semibold text-black transition-all duration-300 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[4px_4px_0px_black] active:translate-x-0 active:translate-y-0 active:shadow-none capitalize focus-within:-translate-x-1 focus-within:-translate-y-1 focus-within:shadow-[4px_4px_0px_black]">
         <div className="flex flex-1 items-center gap-2 px-2">
           <MapPin className="h-5 w-5 shrink-0 text-black" />
           <input
@@ -367,11 +410,12 @@ export default function DeliveryAddressInput({ onSelect }: Props) {
           />
         </div>
 
-        {/* LINK TO /STORE. DISABLED UNTIL AN ADDRESS HAS BEEN CONFIRMED ON THE MAP.
+        {/* LINK TO /STORE. THE URL STAYS CLEAN BECAUSE THE LOCATION TRAVELS IN THE COOKIE SET IN HANDLECONFIRM.
+            DISABLED UNTIL AN ADDRESS HAS BEEN CONFIRMED ON THE MAP.
             LINK HAS NO DISABLED PROP, SO ARIA-DISABLED + PREVENTDEFAULT DOES THE JOB.
             NORMAL-CASE STOPS THE PILL'S CAPITALIZE CLASS FROM TURNING IT INTO "ORDER NOW" */}
         <Link
-          href={storeHref}
+          href="/store"
           aria-disabled={!confirmed}
           onClick={(e) => {
             if (!confirmed) e.preventDefault();
@@ -388,20 +432,42 @@ export default function DeliveryAddressInput({ onSelect }: Props) {
       {open && status === "done" && (
         <div className="absolute z-20 mt-2 max-h-72 w-full overflow-auto rounded-xl border-dotted border-2 border-black bg-white shadow-lg">
           {suggestions.length > 0 ? (
-            <ul>
-              {suggestions.map((s) => (
-                <li key={s.id}>
-                  <button
-                    type="button"
-                    onClick={() => choose(s)}
-                    className="flex w-full items-start gap-2 px-4 py-3 text-left text-sm text-gray-800 hover:bg-gray-50"
-                  >
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
-                    <span>{s.label}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <>
+              <ul>
+                {suggestions.map((s) => (
+                  <li key={s.id}>
+                    <button
+                      type="button"
+                      onClick={() => choose(s)}
+                      className="flex w-full items-start gap-2 px-4 py-3 text-left text-sm text-gray-800 hover:bg-gray-50"
+                    >
+                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
+                      <span>{s.label}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              {/* FOOTER: A WAY OUT WHEN THE SUGGESTIONS ABOVE ARE WRONG BUT NOT EMPTY */}
+              <div className="flex flex-col gap-2 border-t-2 border-dotted border-black p-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={handlePinManually}
+                  className="flex flex-1 items-center justify-center rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-900 transition hover:bg-blue-100"
+                >
+                  Not here? Pin it on the map
+                </button>
+                <button
+                  type="button"
+                  onClick={handleUseCurrentLocation}
+                  disabled={locating}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-900 transition hover:bg-blue-100 disabled:opacity-60"
+                >
+                  {locating && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {locating ? "Locating..." : "Use current location"}
+                </button>
+              </div>
+            </>
           ) : (
             <div className="flex flex-col items-center gap-3 px-4 py-6 text-center">
               <SearchX className="h-6 w-6 text-gray-400" />
@@ -452,11 +518,18 @@ export default function DeliveryAddressInput({ onSelect }: Props) {
               <span>{resolving ? "Updating address..." : pending.label}</span>
             </div>
 
+            {/* HINT: EXPLAINS WHY CONFIRM IS GREYED OUT AFTER "PIN IT ON THE MAP" */}
+            {needsPinMove && (
+              <p className="text-xs text-gray-500">
+                Move the pin to your exact spot to continue.
+              </p>
+            )}
+
             <div className="flex flex-col gap-2 sm:flex-row">
               <button
                 type="button"
                 onClick={handleConfirm}
-                disabled={resolving}
+                disabled={resolving || needsPinMove}
                 className="flex flex-1 items-center justify-center rounded-full bg-blue-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:opacity-60"
               >
                 Confirm location

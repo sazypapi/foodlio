@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import { useState } from "react";
 import { LuUser } from "react-icons/lu";
@@ -12,11 +13,17 @@ import {
 import Link from "next/link";
 import { toast } from "sonner";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 function UserIcon({ isAdmin }: { isAdmin: boolean }) {
   const { user, isSignedIn, isLoaded } = useUser();
   const { signOut } = useClerk();
   const [open, setOpen] = useState(false);
+  const pathName = usePathname();
+  const isStore = pathName === "/store" || pathName.startsWith("/store/");
+
+  // Sizing applied dynamically based on isStore
+  const iconSizeClass = isStore ? "w-7 h-7 lg:h-8 lg:w-8" : "h-8 w-8";
 
   const toastLogout = async () => {
     await signOut();
@@ -27,7 +34,9 @@ function UserIcon({ isAdmin }: { isAdmin: boolean }) {
   if (!isLoaded) {
     return (
       <div className="flex align-middle items-center">
-        <LuUser className="h-8 w-8 bg-primary text-gray-300 rounded-full" />
+        <LuUser
+          className={`${iconSizeClass} bg-primary text-gray-300 rounded-full`}
+        />
       </div>
     );
   }
@@ -43,14 +52,16 @@ function UserIcon({ isAdmin }: { isAdmin: boolean }) {
         {profileImage ? (
           <Image
             src={profileImage}
-            width={28}
-            height={28}
+            width={32}
+            height={32}
             alt="Profile pic"
-            className="h-8 w-8 rounded-full object-cover cursor-pointer"
+            className={`${iconSizeClass} rounded-full object-cover cursor-pointer`}
           />
         ) : (
           <div className="flex align-middle items-center cursor-pointer">
-            <LuUser className="h-8 w-8 bg-primary text-gray-300 rounded-full" />
+            <LuUser
+              className={`${iconSizeClass} bg-primary text-gray-300 rounded-full`}
+            />
           </div>
         )}
 
@@ -112,7 +123,9 @@ function UserIcon({ isAdmin }: { isAdmin: boolean }) {
       onMouseLeave={() => setOpen(false)}
     >
       <div className="flex align-middle items-center cursor-pointer">
-        <LuUser className="h-8 w-8 bg-primary text-gray-300 rounded-full" />
+        <LuUser
+          className={`${iconSizeClass} bg-primary text-gray-300 rounded-full`}
+        />
       </div>
 
       {open && (

@@ -10,7 +10,7 @@ function Containers({
   className?: string;
 }) {
   return (
-    <div className={cn("mx-auto max-w-full xl:max-w-[80%] ", className)}>
+    <div className={cn("mx-auto max-w-full xl:max-w-[80%]", className)}>
       {children}
     </div>
   );
